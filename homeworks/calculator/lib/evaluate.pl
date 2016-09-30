@@ -9,6 +9,7 @@ use 5.010;
 use strict;
 use warnings;
 use diagnostics;
+use Switch;
 BEGIN{
 	if ($] < 5.018) {
 		package experimental;
@@ -17,12 +18,81 @@ BEGIN{
 }
 no warnings 'experimental';
 
-sub evaluate {
+sub evaluate{
+	# -------------------------------------------------------------------------
 	my $rpn = shift;
 
-	# ...
-
-	return 0;
+	my @stack = ();
+	# -------------------------------------------------------------------------
+	for my $c(@$rpn){
+		switch($c){	
+			case "U+" {}
+			case "U-" {
+				if(@stack){
+					my $x = pop(@stack);
+					
+					push(@stack, 0-$x);		
+				}else{
+					die "Bad: '$_'";
+				}
+			}
+			case "^" {
+				if(scalar(@stack) > 1){
+					my $x = pop(@stack);
+					my $y = pop(@stack);
+					
+					push(@stack, $y**$x);			
+				}else{
+					die "Bad: '$_'"; 
+				}
+			}
+			case "*" {
+				if(scalar(@stack) > 1){
+					my $x = pop(@stack);
+					my $y = pop(@stack);
+					
+					push(@stack, $y*$x);			
+				}else{
+					die "Bad: '$_'";
+				}
+			}
+			case "/" {
+				if(scalar(@stack) > 1){
+					my $x = pop(@stack);
+					my $y = pop(@stack);
+					
+					($x != 0) ? push(@stack, $y/$x) : die "Bad: '$_'" ;			
+				}else{
+					die "Bad: '$_'";; 
+				}
+			}
+			case "+" {
+				if(scalar(@stack) > 1){
+					my $x = pop(@stack);
+					my $y = pop(@stack);
+					
+					push(@stack, $y+$x);		
+				}else{
+					die "Bad: '$_'";
+				}	
+			}
+			case "-" {
+				if(scalar(@stack) > 1){
+					my $x = pop(@stack);
+					my $y = pop(@stack);
+					
+					push(@stack, $y-$x);			
+				}else{
+					die "Bad: '$_'";
+				}
+			}
+			else{
+				push(@stack, $c);
+			}
+		}
+	}
+	
+	return pop(@stack);
 }
 
 1;

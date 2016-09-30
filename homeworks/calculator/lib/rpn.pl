@@ -26,7 +26,58 @@ sub rpn {
 	my $source = tokenize($expr);
 	my @rpn;
 
-	# ...
+	my @stack;
+
+	my %priority = (
+			  	'(' => 0, ')' => 0,
+			  '+' => 1, '-' => 1,
+			  '*' => 2, '/' => 2,
+			  'U+'=> 3, 'U-'=> 3,
+			  '^' => 4
+			 );
+	
+	my %order = (
+			  '(' => 'l', ')' => 'l',
+			  'U-'=> 'l', 'U+'=> 'l',
+			  '+' => 'b', '-' => 'b',
+			  '*' => 'b', '/' => 'l',
+			  '^' => 'r'
+	);
+	
+	for my $c(@$source){ 
+		given($c){
+			when(['U-', 'U+', '+', '-', '*', '/', '^']){
+				while(@stack){
+					my $top = $stack[-1];
+					
+					if($order{$top} ne 'r'){
+						($priority{$c} <= $priority{$top}) ? push(@rpn, pop(@stack)) : last;
+					}else{
+						if($priority{$c} < $priority{$top}){
+							push(@rpn, $c); 
+							$c = '';				
+							last;
+						}
+					}
+				}
+				
+				push(@stack, $c) if $c;
+			}
+			when('('){
+				push(@stack, $c);
+			}
+			when(')'){
+				while((my $tmp = pop(@stack)) ne '('){
+					push(@rpn, $tmp);
+				}
+			}
+			default{
+				push(@rpn,''.(0+$c));
+			}
+		}
+	}
+	
+	push @rpn, reverse @stack;
 
 	return \@rpn;
 }
