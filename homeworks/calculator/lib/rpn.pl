@@ -21,64 +21,61 @@ no warnings 'experimental';
 use FindBin;
 require "$FindBin::Bin/../lib/tokenize.pl";
 
-sub rpn {
+sub rpn{
+	# -------------------------------------------------------------------------
 	my $expr = shift;
 	my $source = tokenize($expr);
 	my @rpn;
 
-	my @stack;
-
+	my @stack = ();
+	# -------------------------------------------------------------------------
 	my %priority = (
-			  	'(' => 0, ')' => 0,
-			  '+' => 1, '-' => 1,
-			  '*' => 2, '/' => 2,
-			  'U+'=> 3, 'U-'=> 3,
-			  '^' => 4
-			 );
-	
-	my %order = (
-			  '(' => 'l', ')' => 'l',
-			  'U-'=> 'l', 'U+'=> 'l',
-			  '+' => 'b', '-' => 'b',
-			  '*' => 'b', '/' => 'l',
-			  '^' => 'r'
+		'(' => 0, ')' => 0,
+		'+' => 1, '-' => 1,
+		'*' => 2, '/' => 2,
+		'U+'=> 3, 'U-'=> 3,
+		'^' => 4
 	);
 	
+	my %order = (
+		'(' => 'l', ')' => 'l',
+		'U-'=> 'l', 'U+'=> 'l',
+		'+' => 'b', '-' => 'b',
+		'*' => 'b', '/' => 'l',
+		'^' => 'r'
+	);
+	
+	my @signs = ('U-', 'U+', '+', '-', '*', '/', '^');
+	
 	for my $c(@$source){ 
-		given($c){
-			when(['U-', 'U+', '+', '-', '*', '/', '^']){
-				while(@stack){
-					my $top = $stack[-1];
+		if($c ~~ @signs){
+			while(@stack){
+				my $top = $stack[-1];
 					
-					if($order{$top} ne 'r'){
-						($priority{$c} <= $priority{$top}) ? push(@rpn, pop(@stack)) : last;
-					}else{
-						if($priority{$c} < $priority{$top}){
-							push(@rpn, $c); 
-							$c = '';				
-							last;
-						}
-					}
+				if($order{$top} ne 'r'){
+					($priority{$c} <= $priority{$top}) ? (push(@rpn, pop(@stack))) : (last);
+				}elsif($priority{$c} < $priority{$top}){
+					push(@rpn, $c); 
+					
+					$c = '';				
+					last;
 				}
+			}
 				
-				push(@stack, $c) if $c;
+			push(@stack, $c) if $c;
+		}elsif($c eq '('){
+			push(@stack, $c);
+		}elsif($c eq ')'){
+			while((my $tmp = pop(@stack)) ne '('){
+				push(@rpn, $tmp);
 			}
-			when('('){
-				push(@stack, $c);
-			}
-			when(')'){
-				while((my $tmp = pop(@stack)) ne '('){
-					push(@rpn, $tmp);
-				}
-			}
-			default{
-				push(@rpn,''.(0+$c));
-			}
+		}else{
+			push(@rpn, ''.(0+$c));
 		}
 	}
 	
-	push @rpn, reverse @stack;
-
+	push(@rpn, reverse @stack);
+	
 	return \@rpn;
 }
 

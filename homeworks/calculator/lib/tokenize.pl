@@ -33,25 +33,29 @@ sub remove_spaces{
 	return \@str;
 }
 
-sub readPower{
+sub get_power{
 	my @str = @_;
 
 	my @power = ();
+
 	my $neg = 0;
 	my $sign = 0;
 		
-	while(scalar @str > 0){
+	while(@str){
 		my $c = $str[0];
 		
 		if($c =~ /\d/){
 			push(@power, $c);
+			
 			shift(@str);
 		}elsif($c eq '+' && $sign == 0){
 			$sign = 1;
+
 			shift(@str);
 		}elsif($c eq '-' && $sign == 0){
 			$sign = 1;
 			$neg = 1;
+
 			shift(@str);
 		}elsif($c eq ' '){
 			shift(@str);
@@ -67,68 +71,63 @@ sub readPower{
 	return $p, \@str;
 }
 
-sub readNumber{
+sub get_number{
 	# -------------------------------------------------------------------------
 	my @str = @_;
-	my $str2 = remove_spaces(@str);
-	@str = @$str2;
+	my $str_tmp = remove_spaces(@str);
+	@str = @$str_tmp;
 
 	my @stack = ();
 	# -------------------------------------------------------------------------
-	
 	my @number = ();
 
 	my $frac = 0;
 
 	my $power = 0;
 
-	while(scalar @str > 0){
+	while(@str){
 		my $c = $str[0];
 		
 		if($c eq ' '){
 		}elsif($c =~ /\d/){
 	 		push(@number, $c);
 		}elsif($c eq '.'){
-			if($frac == 1){
-				die 'Error';
-			}
+			die 'Error' if $frac == 1;
 
 			push(@number, $c);	
 			$frac = 1;
 		}elsif($c =~ '[e|E]'){
 			shift(@str);
 			
-			($power, $str2) = readPower(@str);
-			@str = @$str2;
-			
+			($power, $str_tmp) = get_power(@str);
+			@str = @$str_tmp;
 			last;
 		}else{
 			last;
 		}
 
-		shift(@str) if @str;
+		shift(@str);
 	}
 
 	my $num = '';
-	my @n = ();
-
+	
 	if(@number){
 		$num = 0 + join('', @number);
 		$num *= (10 ** $power) if $power;
 	
-		push(@n, $num);
+		@number = ($num);
 	}
 
-	my $correct = (@n) ? (1) : (0);
+	my $correct = (@number) ? (1) : (0);
 
-	return \@n, \@str, $correct;
+	return \@number, \@str, $correct;
 }
 
-sub readSign{
+sub get_sign{
 	# -------------------------------------------------------------------------
 	my @str = @_;
-	my $str2 = remove_spaces(@str);
-	@str = @$str2;
+	my $str_tmp = remove_spaces(@str);
+	@str = @$str_tmp;
 
 	my @stack = ();
 	# -------------------------------------------------------------------------
@@ -153,11 +152,11 @@ sub readSign{
 	return \@stack, \@str, $correct;
 }
 
-sub get_inside{
+sub get_inside{ # ( {INSIDE} ) (inside brackets)
 	# -------------------------------------------------------------------------
 	my @str = @_;
-	my $str2 = remove_spaces(@str);
-	@str = @$str2;
+	my $str_tmp = remove_spaces(@str);
+	@str = @$str_tmp;
 	# -------------------------------------------------------------------------
 	my $fin = 1;
 	
@@ -180,11 +179,11 @@ sub get_inside{
 	return \@inside, $correct, \@str_tail;
 }
 
-sub read_element{
+sub get_element{ # {ELEMENT} | {ELEMENT op ELEMENT} (unary or item of binary)
 	# -------------------------------------------------------------------------
 	my @str = @_;
-	my $str2 = remove_spaces(@str);
-	@str = @$str2;
+	my $str_tmp = remove_spaces(@str);
+	@str = @$str_tmp;
 
 	my @stack = ();
 	# -------------------------------------------------------------------------
@@ -214,11 +213,9 @@ sub read_element{
 
 	die unless @str;
 
-	my $c = $str[0];
-	
-	if($c eq '('){
+	if($str[0] eq '('){
 		($expr, $is_expr, $str_tail) = get_inside(@str);
-		(my $inside, $str2) = read_unitary(@$expr);
+		(my $inside, $str_tmp) = get_expression(@$expr);
 
 		if(scalar @$inside > 0){
 			$num_found = 1;
@@ -229,17 +226,17 @@ sub read_element{
 		}
 
 		@str = @$str_tail;	
-		$str2 = remove_spaces(@str);
-		@str = @$str2;
+		$str_tmp = remove_spaces(@str);
+		@str = @$str_tmp;
 	}else{
-		($num, $str2, $is_num) = readNumber(@str);
+		($num, $str_tmp, $is_num) = get_number(@str);
 		
 		if($is_num){
 			$num_found = 1;
-		
+			
 			push(@stack, @$num);
-		
-			@str = @$str2;	
+			
+			@str = @$str_tmp;	
 		}		
 	}
 	
@@ -249,67 +246,71 @@ sub read_element{
 	return \@stack, \@str, $num_found;
 }
 
-sub read_unitary{
+sub get_expression{
 	# -------------------------------------------------------------------------
 	my @str = @_;
-	my $str2 = remove_spaces(@str);
-	@str = @$str2;
+	my $str_tmp = remove_spaces(@str);
+	@str = @$str_tmp;
 
 	my @stack = ();
 	# -------------------------------------------------------------------------
 	
+	# BEGIN------------------------------------------------UNARY-CASE----------
 	# BEGIN------------------------------------------------PARSE-NUM-1---------
-	(my $num1, $str2, my $num1_found) = read_element(@str);
+	(my $num1, $str_tmp, my $num1_found) = get_element(@str);
 	
 	if($num1_found){
 		push(@stack, @$num1);
 
-		@str = @$str2;	
+		@str = @$str_tmp;	
 	}else{
 		return \@stack, \@str;		
 	}
+	# END--------------------------------------------------UNARY-CASE----------
 	# END--------------------------------------------------PARSE-NUM-1---------
+	
+	# BEGIN------------------------------------------------BINARY-CASE---------
 	while(scalar @str > 0){	
 		# BEGIN--------------------------------------------PARSE-SIGN----------
-		my ($sign, $str2, $is_sign) = readSign(@str);
+		my ($sign, $str_tmp, $is_sign) = get_sign(@str);
 
 		if($is_sign){
 			push(@stack, @$sign);
 		
-			@str = @$str2;
+			@str = @$str_tmp;
 		}else{
 			return \@stack, \@str;		
 		}
 		# END----------------------------------------------PARSE-SIGN----------
 		
 		# BEGIN--------------------------------------------PARSE-NUM-2---------
-		(my $num2, $str2, my $num2_found) = read_element(@str);
+		(my $num2, $str_tmp, my $num2_found) = get_element(@str);
 		
 		if($num2_found){
 			push(@stack, @$num2);
 
-			@str = @$str2;
+			@str = @$str_tmp;
 		}else{
 			return \@stack, \@str;
 		}
 		# END----------------------------------------------PARSE-NUM-2---------
 	}
-
+	# END--------------------------------------------------BINARY-CASE---------
+	
 	return \@stack, \@str;
 }
 
 
-sub tokenize{
+sub tokenize($){
 	chomp(my $expr = shift);
-	my @res;
-
-	my @str = split(//,$expr);
 	
-	my $str2;
+	my @str = split(//, $expr);
 	
-	(my $stack, @$str2) = read_unitary(@str);
+	my $str_tmp;
 	
-	@res = @$stack;
+	(my $stack, @$str_tmp) = get_expression(@str);
+	
+	my @res = @$stack;
 
 	return \@res;
 }

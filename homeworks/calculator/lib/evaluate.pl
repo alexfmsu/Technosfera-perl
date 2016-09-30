@@ -61,7 +61,7 @@ sub evaluate{
 					my $x = pop(@stack);
 					my $y = pop(@stack);
 					
-					($x != 0) ? push(@stack, $y/$x) : die "Bad: '$_'" ;			
+					($x != 0) ? (push(@stack, $y/$x)) : (die "Bad: '$_'");			
 				}else{
 					die "Bad: '$_'";; 
 				}
