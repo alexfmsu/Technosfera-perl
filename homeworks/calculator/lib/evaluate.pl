@@ -9,7 +9,6 @@ use 5.010;
 use strict;
 use warnings;
 use diagnostics;
-use Switch;
 BEGIN{
 	if ($] < 5.018) {
 		package experimental;
@@ -25,9 +24,8 @@ sub evaluate{
 	my @stack = ();
 	# -------------------------------------------------------------------------
 	for my $c(@$rpn){
-		switch($c){	
-			case "U+" {}
-			case "U-" {
+			if($c eq 'U+'){}
+			elsif($c eq 'U-'){
 				if(@stack){
 					my $x = pop(@stack);
 					
@@ -35,8 +33,7 @@ sub evaluate{
 				}else{
 					die "Bad: '$_'";
 				}
-			}
-			case "^" {
+			}elsif($c eq '^'){
 				if(scalar(@stack) > 1){
 					my $x = pop(@stack);
 					my $y = pop(@stack);
@@ -45,8 +42,7 @@ sub evaluate{
 				}else{
 					die "Bad: '$_'"; 
 				}
-			}
-			case "*" {
+			}elsif($c eq '*'){
 				if(scalar(@stack) > 1){
 					my $x = pop(@stack);
 					my $y = pop(@stack);
@@ -55,8 +51,7 @@ sub evaluate{
 				}else{
 					die "Bad: '$_'";
 				}
-			}
-			case "/" {
+			}elsif($c eq '/'){
 				if(scalar(@stack) > 1){
 					my $x = pop(@stack);
 					my $y = pop(@stack);
@@ -65,8 +60,7 @@ sub evaluate{
 				}else{
 					die "Bad: '$_'";; 
 				}
-			}
-			case "+" {
+			}elsif($c eq '+'){
 				if(scalar(@stack) > 1){
 					my $x = pop(@stack);
 					my $y = pop(@stack);
@@ -75,8 +69,7 @@ sub evaluate{
 				}else{
 					die "Bad: '$_'";
 				}	
-			}
-			case "-" {
+			}elsif($c eq '-'){
 				if(scalar(@stack) > 1){
 					my $x = pop(@stack);
 					my $y = pop(@stack);
@@ -85,11 +78,9 @@ sub evaluate{
 				}else{
 					die "Bad: '$_'";
 				}
-			}
-			else{
+			}else{
 				push(@stack, $c);
 			}
-		}
 	}
 	
 	return pop(@stack);
