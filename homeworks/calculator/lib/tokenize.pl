@@ -96,7 +96,7 @@ sub get_number{
 
 			push(@number, $c);	
 			$frac = 1;
-		}elsif($c =~ '[e|E]'){
+		}elsif($c =~ /[eE]/){
 			shift(@str);
 			
 			($power, $str_tmp) = get_power(@str);
@@ -138,7 +138,7 @@ sub get_sign{
 
 		if($c eq ' '){
 			shift(@str);
-		}elsif($c =~ '[+|\-|*|/|^]'){
+		}elsif($c =~ /[+\-*\/^]/){
 			$correct = 1;
 
 			push(@stack, $c);
@@ -200,7 +200,7 @@ sub get_element{ # {ELEMENT} | {ELEMENT op ELEMENT} (unary or item of binary)
 	my @sign_stack = ();	
 	
 	while(@str){
-		if($str[0] =~ '[+|\-]'){
+		if($str[0] =~ /[+\-]/){
 			$num_sign = 1;
 			push(@sign_stack, 'U'.$str[0]);
 			shift(@str);
