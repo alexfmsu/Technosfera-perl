@@ -75,9 +75,7 @@ sub read_library{
 		}x){
 			my %h = ();
 			
-			for my $c(@titles){
-				$h{$c} = $+{$c};
-			}
+			$h{$_} = $+{$_} for(@titles);
 			
 			push @arr, \%h;
 		}else{
