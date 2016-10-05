@@ -94,15 +94,15 @@ sub apply_filters{
 	exit 0 if(defined($columns) && $columns eq '');
 	
 	for(my $i = 0; $i < scalar @tb; $i++){
-		my %str = %{$tb[$i]};
+		my %row = %{$tb[$i]};
 	 	
-	 	next if($band && $str{$titles[0]} ne $band);
-		next if($year && (0+$str{$titles[1]}) != $year);
-		next if($album && $str{$titles[2]} ne $album);
-		next if($track && $str{$titles[3]} ne $track);
-		next if($format && $str{$titles[4]} ne $format);
+	 	next if($band && $row{$titles[0]} ne $band);
+		next if($year && (0+$row{$titles[1]}) != $year);
+		next if($album && $row{$titles[2]} ne $album);
+		next if($track && $row{$titles[3]} ne $track);
+		next if($format && $row{$titles[4]} ne $format);
 		
-		push @select, \%str; 
+		push @select, \%row; 
 	}
 	
 	if(!defined($columns)){
