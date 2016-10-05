@@ -51,7 +51,7 @@ my @select = ();
 my @select_titles = ();
 my %lengths = ();
 
-sub set_filters{
+sub read_library{
 	GetOptions(
 		"band:s" => \$band,
 		"year:i" => \$year,
@@ -61,9 +61,7 @@ sub set_filters{
 		"sort:s" => \$sort,
 		"columns:s" => \$columns
 	);	
-};
 
-sub read_library{
 	while(<>){
 		if(m{
 			^
