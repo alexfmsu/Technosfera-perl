@@ -56,11 +56,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Local::Iterator
 NAME_SYM = Local_Iterator
-VERSION = 0
+VERSION = 1.00
 VERSION_MACRO = VERSION
-VERSION_SYM = 0
+VERSION_SYM = 1_00
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0
+XS_VERSION = 1.00
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -183,11 +183,8 @@ PERL_ARCHIVEDEP    =
 PERL_ARCHIVE_AFTER = 
 
 
-TO_INST_PM = lib/Local/MusicLibrary.pl \
-	lib/Local/MusicLibrary.pm \
-	lib/Local/music_library.pl \
-	lib/Local/printer.pm \
-	lib/printer.pm
+TO_INST_PM = lib/Local/MusicLibrary.pm \
+	lib/Local/printer.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -257,7 +254,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Local-Iterator
-DISTVNAME = Local-Iterator-0
+DISTVNAME = Local-Iterator-1.00
 
 
 # --- MakeMaker macro section:
@@ -518,7 +515,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  directory:' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - t' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''1.00'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
@@ -555,7 +552,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "1.00"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -864,7 +861,7 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Local-Iterator" VERSION="0">' > Local-Iterator.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Local-Iterator" VERSION="1.00">' > Local-Iterator.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT></ABSTRACT>' >> Local-Iterator.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR></AUTHOR>' >> Local-Iterator.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Local-Iterator.ppd
@@ -878,11 +875,8 @@ ppd :
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
-	  'lib/Local/MusicLibrary.pl' 'blib/lib/Local/MusicLibrary.pl' \
 	  'lib/Local/MusicLibrary.pm' 'blib/lib/Local/MusicLibrary.pm' \
-	  'lib/Local/music_library.pl' 'blib/lib/Local/music_library.pl' \
-	  'lib/Local/printer.pm' 'blib/lib/Local/printer.pm' \
-	  'lib/printer.pm' 'blib/lib/printer.pm' 
+	  'lib/Local/printer.pm' 'blib/lib/Local/printer.pm' 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 
