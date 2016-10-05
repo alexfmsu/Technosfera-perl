@@ -80,6 +80,8 @@ sub read_library{
 			}
 			
 			push @arr, \%h;
+		}else{
+			die 'Incorrect input data\n';
 		}
 	}
 }
