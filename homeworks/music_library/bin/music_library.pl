@@ -7,12 +7,6 @@ use utf8;
 use Getopt::Long;
 use Local::MusicLibrary;
 
-BEGIN{
-	if ($] < 5.018) {
-		package experimental;
-		use warnings::register;
-	}
-}
 no warnings 'experimental';
 
 binmode(STDIN, ':utf8');
