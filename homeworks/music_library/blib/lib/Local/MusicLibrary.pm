@@ -4,17 +4,12 @@ use 5.16.0;
 use strict;
 use warnings;
 use utf8;
+
 use Getopt::Long;
 
 binmode(STDIN, ':utf8');
 binmode(STDOUT, ':utf8');
 
-BEGIN{
-	if ($] < 5.018) {
-		package experimental;
-		use warnings::register;
-	}
-}
 no warnings 'experimental';
 
 =encoding utf8

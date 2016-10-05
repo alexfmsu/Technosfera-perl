@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use utf8;
 
-use Getopt::Long;
 use Local::MusicLibrary;
 
 no warnings 'experimental';
