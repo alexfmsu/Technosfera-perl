@@ -44,7 +44,7 @@ our $columns;
 my @arr = ();
 my @select = ();
 my @select_titles = ();
-my %lengths = ();
+my %cell_size = ();
 
 sub read_library{
 	GetOptions(
@@ -149,7 +149,7 @@ sub format_output{
 			my $l = length $str{$titles[$j]};
 			
 			if($l > $len[$j]){
-				$lengths{$titles[$j]} = $len[$j] = $l; 
+				$cell_size{$titles[$j]} = $len[$j] = $l; 
 			}
 		}
 	}
@@ -163,7 +163,7 @@ sub print_library{
 	my $width = 3 * ($l -1) + 2;
 	
 	for(@select_titles){
-		my $value = $lengths{$_};
+		my $value = $cell_size{$_};
 		$width += $value if($value);
 	}
 	# -------------------------------------------------------------------------
@@ -190,7 +190,7 @@ sub print_library{
 		for my $param(@select_titles){	
 			my $value = $str{$param};
 
-			my $width = $lengths{$param} + 3;
+			my $width = $cell_size{$param} + 3;
 			$out .= sprintf("%".$width."s", " ".$value." |");		
 			
 			$not_empty_query = 1;
@@ -202,9 +202,9 @@ sub print_library{
 			$out .= sprintf("|");
 
 			for my $param(@select_titles){	
-				my $width = $lengths{$param} + 3;
+				my $width = $cell_size{$param} + 3;
 				
-				$out .= sprintf("%".$width."s", "-" x ($lengths{$param}+2)."+");	
+				$out .= sprintf("%".$width."s", "-" x ($cell_size{$param}+2)."+");	
 			}
 
 			chop($out);
