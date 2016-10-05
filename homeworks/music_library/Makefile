@@ -183,8 +183,7 @@ PERL_ARCHIVEDEP    =
 PERL_ARCHIVE_AFTER = 
 
 
-TO_INST_PM = lib/Local/MusicLibrary.pm \
-	lib/Local/printer.pm
+TO_INST_PM = lib/Local/MusicLibrary.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -875,8 +874,7 @@ ppd :
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
-	  'lib/Local/MusicLibrary.pm' 'blib/lib/Local/MusicLibrary.pm' \
-	  'lib/Local/printer.pm' 'blib/lib/Local/printer.pm' 
+	  'lib/Local/MusicLibrary.pm' 'blib/lib/Local/MusicLibrary.pm' 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 
