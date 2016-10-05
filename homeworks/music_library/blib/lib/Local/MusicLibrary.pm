@@ -41,7 +41,7 @@ our $format;
 our $sort;
 our $columns;
 
-my @arr = ();
+my @tb = ();
 my @select = ();
 my @select_titles = ();
 my %cell_size = ();
@@ -77,7 +77,7 @@ sub read_library{
 			
 			$h{$_} = $+{$_} for(@titles);
 			
-			push @arr, \%h;
+			push @tb, \%h;
 		}else{
 			die 'Incorrect input data\n';
 		}
@@ -93,8 +93,8 @@ sub apply_filters{
 	exit 0 if(defined($sort) && $sort eq '');
 	exit 0 if(defined($columns) && $columns eq '');
 	
-	for(my $i = 0; $i < scalar @arr; $i++){
-		my %str = %{$arr[$i]};
+	for(my $i = 0; $i < scalar @tb; $i++){
+		my %str = %{$tb[$i]};
 	 	
 	 	next if($band && $str{$titles[0]} ne $band);
 		next if($year && (0+$str{$titles[1]}) != $year);
