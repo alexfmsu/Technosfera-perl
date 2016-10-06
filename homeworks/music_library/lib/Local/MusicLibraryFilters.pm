@@ -37,9 +37,7 @@ sub apply_filters{
 	
 	for(@$args){
 		if($_ eq 'year'){
-			die("Option --'".$_."' requires an argument\n") if(defined(${$_}) && ${$_} == 0);	
-		}else{
-			die("Option --'".$_."' requires an argument\n") if(defined(${$_}) && ${$_} eq '');	
+			die("Option --'".$_."' requires an argument\n") if(defined(${$_}) && (${$_} == 0 || ${$_} == 0));	
 		}
 	}
 
@@ -92,7 +90,6 @@ sub sort_library{
 
 	if($sort && any{$_ eq $sort} @titles){
 		@select = sort{$a->{$sort} <=> $b->{$sort} || $a->{$sort} cmp $b->{$sort}} @select;
-		# @select = sort{$a->{$sort} cmp $b->{$sort}} @select;	
 	}
 
 	return \@select;
