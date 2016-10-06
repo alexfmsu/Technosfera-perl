@@ -5,17 +5,20 @@ use strict;
 use warnings;
 use utf8;
 
-use Local::MusicLibrary;
-
-no warnings 'experimental';
+use Local::MusicLibraryReader;
+use Local::MusicLibraryFilters;
+use Local::MusicLibraryPrinter;
 
 binmode(STDIN,':utf8');
 binmode(STDOUT,':utf8');
 
-MusicLibrary::read_library();
+my @titles = ('band', 'year', 'album', 'track', 'format');
+my @args = ('band', 'year', 'album', 'track', 'format', 'sort', 'columns');
 
-MusicLibrary::apply_filters();
+my $tb = MusicLibraryReader::read_library(\@titles);
 
-MusicLibrary::sort_library();
+(my $select_titles, my $select) = MusicLibraryFilters::apply_filters(\@titles, $tb, \@args);
 
-MusicLibrary::print_library();
+$select = MusicLibraryFilters::sort_library(\@titles, $select);
+
+MusicLibraryPrinter::print_library(\@titles, $select_titles, $select);

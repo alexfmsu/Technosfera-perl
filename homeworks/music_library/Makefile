@@ -160,7 +160,8 @@ C_FILES  =
 O_FILES  = 
 H_FILES  = 
 MAN1PODS = 
-MAN3PODS = lib/Local/MusicLibrary.pm
+MAN3PODS = lib/Local/MusicLibrary.pm \
+	lib/Local/MusicLibraryReader.pm
 
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
@@ -183,7 +184,10 @@ PERL_ARCHIVEDEP    =
 PERL_ARCHIVE_AFTER = 
 
 
-TO_INST_PM = lib/Local/MusicLibrary.pm
+TO_INST_PM = lib/Local/MusicLibrary.pm \
+	lib/Local/MusicLibraryFilters.pm \
+	lib/Local/MusicLibraryPrinter.pm \
+	lib/Local/MusicLibraryReader.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -410,9 +414,11 @@ POD2MAN = $(POD2MAN_EXE)
 
 
 manifypods : pure_all config  \
-	lib/Local/MusicLibrary.pm
+	lib/Local/MusicLibrary.pm \
+	lib/Local/MusicLibraryReader.pm
 	$(NOECHO) $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) -u \
-	  lib/Local/MusicLibrary.pm $(INST_MAN3DIR)/Local::MusicLibrary.$(MAN3EXT) 
+	  lib/Local/MusicLibrary.pm $(INST_MAN3DIR)/Local::MusicLibrary.$(MAN3EXT) \
+	  lib/Local/MusicLibraryReader.pm $(INST_MAN3DIR)/Local::MusicLibraryReader.$(MAN3EXT) 
 
 
 
@@ -874,7 +880,10 @@ ppd :
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
-	  'lib/Local/MusicLibrary.pm' 'blib/lib/Local/MusicLibrary.pm' 
+	  'lib/Local/MusicLibrary.pm' 'blib/lib/Local/MusicLibrary.pm' \
+	  'lib/Local/MusicLibraryFilters.pm' 'blib/lib/Local/MusicLibraryFilters.pm' \
+	  'lib/Local/MusicLibraryPrinter.pm' 'blib/lib/Local/MusicLibraryPrinter.pm' \
+	  'lib/Local/MusicLibraryReader.pm' 'blib/lib/Local/MusicLibraryReader.pm' 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 
