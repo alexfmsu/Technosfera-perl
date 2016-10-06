@@ -9,16 +9,12 @@ use Local::MusicLibraryReader;
 use Local::MusicLibraryFilters;
 use Local::MusicLibraryPrinter;
 
+use Local::MusicLibrary;
+
 binmode(STDIN,':utf8');
 binmode(STDOUT,':utf8');
 
 my @titles = ('band', 'year', 'album', 'track', 'format');
 my @args = ('band', 'year', 'album', 'track', 'format', 'sort', 'columns');
 
-my $tb = MusicLibraryReader::read_library(\@titles);
-
-(my $select_titles, my $select) = MusicLibraryFilters::apply_filters(\@titles, $tb, \@args);
-
-$select = MusicLibraryFilters::sort_library(\@titles, $select);
-
-MusicLibraryPrinter::print_library(\@titles, $select_titles, $select);
+MusicLibrary::print_library(\@titles, \@args);
