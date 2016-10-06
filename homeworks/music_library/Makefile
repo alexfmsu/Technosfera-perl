@@ -184,7 +184,6 @@ PERL_ARCHIVE_AFTER =
 
 
 TO_INST_PM = lib/Local/MusicLibrary.pm \
-	lib/Local/MusicLibrary2.pm \
 	lib/Local/MusicLibraryFilters.pm \
 	lib/Local/MusicLibraryPrinter.pm \
 	lib/Local/MusicLibraryReader.pm
@@ -879,7 +878,6 @@ ppd :
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
 	  'lib/Local/MusicLibrary.pm' 'blib/lib/Local/MusicLibrary.pm' \
-	  'lib/Local/MusicLibrary2.pm' 'blib/lib/Local/MusicLibrary2.pm' \
 	  'lib/Local/MusicLibraryFilters.pm' 'blib/lib/Local/MusicLibraryFilters.pm' \
 	  'lib/Local/MusicLibraryPrinter.pm' 'blib/lib/Local/MusicLibraryPrinter.pm' \
 	  'lib/Local/MusicLibraryReader.pm' 'blib/lib/Local/MusicLibraryReader.pm' 
