@@ -91,11 +91,8 @@ sub sort_library{
 	my @select = @$_select;
 
 	if($sort && any{$_ eq $sort} @titles){
-		if($sort eq 'year'){
-			@select = sort{$a->{$sort} <=> $b->{$sort}} @select;
-		}else{
-			@select = sort{$a->{$sort} cmp $b->{$sort}} @select;	
-		}
+		@select = sort{$a->{$sort} <=> $b->{$sort} || $a->{$sort} cmp $b->{$sort}} @select;
+		# @select = sort{$a->{$sort} cmp $b->{$sort}} @select;	
 	}
 
 	return \@select;
