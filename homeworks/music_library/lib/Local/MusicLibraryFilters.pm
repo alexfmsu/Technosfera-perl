@@ -91,21 +91,10 @@ sub sort_library{
 	my @select = @$_select;
 
 	if($sort && any{$_ eq $sort} @titles){
-		for my $i(0..$#select-1){
-			for my $j(($i+1)..$#select){
-				my $a = $select[$i];
-				my $b = $select[$j];
-				
-				if($sort eq 'year'){	
-					if(%{$a}{$sort} > %{$b}{$sort}){
-						($select[$i], $select[$j]) = ($select[$j], $select[$i]);
-					}	
-				}else{
-					if(%{$a}{$sort} gt %{$b}{$sort}){
-						($select[$i], $select[$j]) = ($select[$j], $select[$i]);
-					}		
-				}
-			}
+		if($sort eq 'year'){
+			@select = sort{$a->{$sort} <=> $b->{$sort}} @select;
+		}else{
+			@select = sort{$a->{$sort} cmp $b->{$sort}} @select;	
 		}
 	}
 
