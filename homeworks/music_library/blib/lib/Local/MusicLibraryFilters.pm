@@ -8,6 +8,7 @@ use utf8;
 use Getopt::Long;
 use List::MoreUtils qw{any};
 
+# -------------------------------------------------------------------------------------------------
 our $band;
 our $year;
 our $album;
@@ -27,6 +28,11 @@ GetOptions(
 	"columns:s" => \$columns
 );
 
+my @num_options = ();
+
+push @num_options, 'year';
+# -------------------------------------------------------------------------------------------------
+	
 sub apply_filters{
 	(my $titles, my $tb, my $args) = (shift, shift, shift);
 
@@ -34,10 +40,12 @@ sub apply_filters{
 	my @select_titles = ();
 
 	no strict 'refs';
-	
-	for(@$args){
-		if($_ eq 'year'){
-			die("Option --'".$_."' requires an argument\n") if(defined(${$_}) && (${$_} == 0 || ${$_} == 0));	
+	no warnings 'experimental';
+	for my $i (@$args){
+		if(any{$_ eq $i} @num_options){
+			die("Option --'".$_."' requires an argument\n") if(defined(${$_}) && ${$_} == 0);	
+		}else{
+			die("Option --'".$_."' requires an argument\n") if(defined(${$_}) && ${$_} eq '');	
 		}
 	}
 
@@ -47,16 +55,12 @@ sub apply_filters{
 	 	my $found = 1;
 
 	 	for my $i(@$titles){
-	 		if($i eq 'year'){
-	 			if($$i && $row{$i} != $$i){
-	 				$found = 0;
-	 				next;
-	 			}	
-	 		}else{
-	 			if($$i && $row{$i} ne $$i){
-	 				$found = 0;
-	 				next;
-	 			}	
+	 		if($$i){
+	 			if(any{$_ eq $i} @num_options){
+	 				$found = 0 if($row{$i} != $$i);
+	 			}else{
+	 				$found = 0 if($row{$i} ne $$i);
+	 			}
 	 		}
 	 	}
 
@@ -89,7 +93,11 @@ sub sort_library{
 	my @select = @$_select;
 
 	if($sort && any{$_ eq $sort} @titles){
-		@select = sort{$a->{$sort} <=> $b->{$sort} || $a->{$sort} cmp $b->{$sort}} @select;
+		if(any{$_ eq $sort} @num_options){	
+			@select = sort{ $a->{$sort} <=> $b->{$sort}} @select;
+		}else{
+			@select = sort{ $a->{$sort} cmp $b->{$sort}} @select;	
+		}
 	}
 
 	return \@select;

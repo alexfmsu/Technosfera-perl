@@ -45,7 +45,7 @@ sub print_library{
     my $out;
     
     $out .= sprintf('/');
-    $out .= sprintf("-" x $width);
+    $out .= sprintf("-" x $width) if $width > 0;
     $out .= sprintf('\\');
     $out .= sprintf("\n");
     # END---------------------------------------------HEADER---------------------------------------
@@ -94,7 +94,7 @@ sub print_library{
     
     # BEGIN-------------------------------------------FOOTER---------------------------------------
     $out .= sprintf('\\');
-    $out .= sprintf("-" x $width);
+    $out .= sprintf("-" x $width) if $width > 0;
     $out .= sprintf("/");
     $out .= sprintf("\n");
     # END---------------------------------------------FOOTER---------------------------------------
