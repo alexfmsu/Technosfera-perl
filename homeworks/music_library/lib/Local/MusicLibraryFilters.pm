@@ -28,9 +28,27 @@ GetOptions(
 	"columns:s" => \$columns
 );
 
-my @num_options = ();
+sub sort_num{
+	(my $x, my $y) = (shift, shift);
 
-push @num_options, 'year';
+	return $x <=> $y;
+};
+
+sub sort_str{
+	(my $x, my $y) = (shift, shift);
+
+	return $x cmp $y;
+};
+
+my %sort_foo = (
+	'band' => \&sort_str,
+	'year' => \&sort_num,
+	'album' => \&sort_str,
+	'track' => \&sort_str,
+	'format' => \&sort_str,
+	'sort' => \&sort_str,
+	'columns' => \&sort_str
+);
 # -------------------------------------------------------------------------------------------------
 	
 sub apply_filters{
@@ -42,11 +60,7 @@ sub apply_filters{
 	no strict 'refs';
 	no warnings 'experimental';
 	for my $i (@$args){
-		if(any{$_ eq $i} @num_options){
-			die("Option --'".$_."' requires an argument\n") if(defined(${$_}) && ${$_} == 0);	
-		}else{
-			die("Option --'".$_."' requires an argument\n") if(defined(${$_}) && ${$_} eq '');	
-		}
+		die("Option --'".$i."' requires an argument\n") if(defined($$_) && $sort_foo{$i}($$i, ''));	
 	}
 
 	for(@$tb){
@@ -55,13 +69,7 @@ sub apply_filters{
 	 	my $found = 1;
 
 	 	for my $i(@$titles){
-	 		if($$i){
-	 			if(any{$_ eq $i} @num_options){
-	 				$found = 0 if($row{$i} != $$i);
-	 			}else{
-	 				$found = 0 if($row{$i} ne $$i);
-	 			}
-	 		}
+	 		$found = 0 if $$i && $sort_foo{$i}($$i, $row{$i});
 	 	}
 
 	 	next if(!$found);
@@ -93,11 +101,7 @@ sub sort_library{
 	my @select = @$_select;
 
 	if($sort && any{$_ eq $sort} @titles){
-		if(any{$_ eq $sort} @num_options){	
-			@select = sort{ $a->{$sort} <=> $b->{$sort}} @select;
-		}else{
-			@select = sort{ $a->{$sort} cmp $b->{$sort}} @select;	
-		}
+		@select = sort{ $sort_foo{$sort} ($a->{$sort}, $b->{$sort}) } @select;
 	}
 
 	return \@select;
