@@ -94,7 +94,7 @@ sub splitObject{
 			my $key = $+{key};
 			my $value = $+{value};
 
-			trim($key);
+			$key = trim($key);
 			
 			if($key =~ /$string/){
 				$key =~ s/^\"//;
@@ -173,7 +173,7 @@ sub getObject{
 
 # GET-VALUE
 sub getValue{ 
-	trim(shift);
+	$_ = trim(shift);
 		
 	return getArray($1) if /^\[(.*)\]$/s;
 	return getObject($1) if /^\{(.*)\}$/s;
