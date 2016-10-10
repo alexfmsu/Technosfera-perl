@@ -133,7 +133,7 @@ sub splitArray{
 		)
 		|
 		(
-			(^|\,)
+			(^|\,\s*)
 			(?<value>
 				($string|\w+)
 				(?=\,|$)
