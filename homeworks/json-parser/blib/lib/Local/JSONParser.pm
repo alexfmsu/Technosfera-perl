@@ -12,41 +12,40 @@ our @EXPORT = qw( parse_json );
 
 
 # NUMBER
-our $number = 
-	'[\-]?'.
-	'('.
-		'0'.
-		'|'.
-		'([1-9]\d*)'.
-	')'.
-	'('.
-		'\.\d+'.
-	')*'.
-	'('.
-		'[eE][\+\-]?\d+'.
-	')?'
-;
+our $number = qr{
+	[\-]?
+	(
+		0
+		|
+		([1-9]\d*)
+	)
+	(
+		\.\d+
+	)*
+	(
+		[eE][\+\-]?\d+
+	)?
+}x;
 # NUMBER
 
-# STRING
-our $special_char =
-	'[\\\]'.
-	'('.
-		'["|\\\|/|b|f|n|r|t]'.
-		'|'.
-		'(u[[:xdigit:]]{4})'.
-	')'
-;
+our $special_char = qr{
+	[\\]
+	(
+		["|\\|/|b|f|n|r|t]
+		|
+		(u[[:xdigit:]]{4})
+	)
+}x;
 
-our $string = 
- 	'\"'.
- 	"(".
- 		$special_char.
- 		'|'.
- 		'[^\\"\\\]'.
- 	')*'.
-	'\"'
-;
+our $string = qr{
+ 	\"
+ 	(
+ 		(??{$special_char})
+ 		|
+ 		[^\"\\]
+ 	)*
+	\"
+}x;
 # STRING
 
 # TRIM
@@ -102,10 +101,6 @@ sub splitObject{
 			}
 				
 			$obj{$key} = getValue($value);
-		}elsif(defined($+{obj})){
-			%obj = getObject($+{obj});
-		}elsif(defined($+{arr})){
-			%obj = getArray($+{arr});
 		}
 	}
 
