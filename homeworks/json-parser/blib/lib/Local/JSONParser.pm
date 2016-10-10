@@ -71,10 +71,8 @@ sub splitObject{
 			(?<key>
 				(
 					\".+?\"
-					|
-					\w+?
 				)
-			)(\s*)\:
+			)\s*\:\s*
 						
 			(?<value>
 				(
@@ -94,13 +92,7 @@ sub splitObject{
 			my $key = $+{key};
 			my $value = $+{value};
 
-			$key = trim($key);
-			
-			if($key =~ /$string/){
-				$key =~ s/^\"//;
-				$key =~ s/\"$//;
-			}
-				
+			$key = getKey($key);
 			$obj{$key} = getValue($value);
 		}
 	}
@@ -167,30 +159,27 @@ sub getObject{
 }
 # GET-OBJECT
 
-# GET-VALUE
-sub getValue{ 
-	$_ = trim(shift);
-		
-	return getArray($1) if /^\[(.*)\]$/s;
-	return getObject($1) if /^\{(.*)\}$/s;
-	return $1 if /^(\s*|null|true|false|$number)$/;
+our %spec_chars = (
+	'\\\"' => "\"",
+	'\\\\' => "\\",
+	'\\\/' => "\/",
+	'\\\b' => "\b",
+	'\\\f' => "\f",
+	'\\\n' => "\n",
+	'\\\r' => "\r",
+	'\\\t' => "\t" 
+);
 
-	my %spec_chars = (
-		'\\\"' => "\"",
-		'\\\\' => "\\",
-		'\\\/' => "\/",
-		'\\\b' => "\b",
-		'\\\f' => "\f",
-		'\\\n' => "\n",
-		'\\\r' => "\r",
-		'\\\t' => "\t" 
-	);
+
+# GET-STRING
+sub getString{
+	$_ = trim(shift);
 
 	if(/^$string$/){
 		$_ =~ s/^\"//;
 		$_ =~ s/\"$//;
 		
-		for my $key(keys %spec_chars) {
+		for my $key(keys %spec_chars){
         	my $value = $spec_chars{$key};
         	
         	$_ =~ s/(?<!\\)$key/$value/e;
@@ -199,9 +188,29 @@ sub getValue{
 		$_ =~ s/(?<!\\)\\u([[:xdigit:]]{4})/chr(hex $1)/ge;
 			
 		return $_;
-	}
+	}else{
+		die "Error";	
+	}	
+}
+# GET-STRING
+
+# GET-KEY
+sub getKey{
+	$_ = shift;
+
+	return getString($_);
+}
+# GET-KEY
+
+# GET-VALUE
+sub getValue{ 
+	$_ = trim(shift);
 		
-	die "Error";
+	return getArray($1) if /^\[(.*)\]$/s;
+	return getObject($1) if /^\{(.*)\}$/s;
+	return $1 if /^(\s*|null|true|false|$number)$/;
+	
+	return getString($_);
 }
 # GET-VALUE
 	
