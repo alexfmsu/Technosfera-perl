@@ -99,7 +99,7 @@ sub splitObject{
 		}
 	}
 
-	die "Error: parse $expr\n" if($expr ne '' && !%obj);
+	die "Error: parse $_\n" if($_ ne '' && !%obj);
 		
 	return \%obj;
 }
