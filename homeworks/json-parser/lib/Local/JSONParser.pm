@@ -1,5 +1,6 @@
 package Local::JSONParser;
 
+use 5.16.0;
 use strict;
 use warnings;
 use utf8;
@@ -29,6 +30,7 @@ our $number = qr{
 }x;
 # NUMBER
 
+# STRING
 our $special_char = qr{
 	[\\]
 	(
@@ -87,7 +89,7 @@ sub splitObject{
 				(?=\,|$)
 			)(\,|$)
 		)
-	/gxsm){
+	/gxs){
 		if(defined($+{key}) and defined($+{value})){
 			my $key = $+{key};
 			my $value = $+{value};
@@ -97,7 +99,7 @@ sub splitObject{
 		}
 	}
 
-	die "Error: parse $_\n" if($_ ne '' && !%obj);
+	die "Error: parse $expr\n" if($expr ne '' && !%obj);
 		
 	return \%obj;
 }
@@ -127,11 +129,11 @@ sub splitArray{
 		(
 			(^|\,\s*)
 			(?<value>
-				($string|\w+)
+				($string|\w+)\s*
 				(?=\,|$)
 			)
 		)
-	/gxsm){
+	/gxs){
 		if(defined($+{value})){
 			push @arr, getValue($+{value});
 		}elsif(defined($+{obj})){
@@ -149,7 +151,9 @@ sub splitArray{
 
 # GET-ARRAY
 sub getArray{
-	return splitArray(shift);
+	my $a = shift;
+
+	return splitArray($a);
 }
 # GET-ARRAY
 	
