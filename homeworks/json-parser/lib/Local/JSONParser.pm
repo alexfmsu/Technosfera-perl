@@ -151,15 +151,25 @@ sub splitArray{
 
 # GET-ARRAY
 sub getArray{
-	my $a = shift;
+	$_ = shift;
 
-	return splitArray($a);
+	if(m/\s*\,\s*$/){
+		die "Error";
+	}
+
+	return splitArray($_);
 }
 # GET-ARRAY
 	
 # GET-OBJECT
 sub getObject{
-	return splitObject(shift);
+	$_ = shift;
+
+	if(m/\s*\,\s*$/){
+		die "Error";
+	}
+
+	return splitObject($_);
 }
 # GET-OBJECT
 
