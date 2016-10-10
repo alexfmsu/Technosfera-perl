@@ -2,6 +2,7 @@ package Local::JSONParser;
 
 use strict;
 use warnings;
+use utf8;
 
 use base qw(Exporter);
 use Encode qw(encode decode);
@@ -9,7 +10,7 @@ use Encode qw(encode decode);
 our @EXPORT_OK = qw( parse_json );
 our @EXPORT = qw( parse_json );
 
-
+binmode(STDOUT,':utf8');
 
 # NUMBER
 our $number = qr{
@@ -174,12 +175,30 @@ sub getValue{
 	return getObject($1) if /^\{(.*)\}$/s;
 	return $1 if /^(\s*|null|true|false|$number)$/;
 
-	if(/^$string$/){
-		s/u([[:xdigit:]]{4})/x{$1}/;
-		
-		encode('utf-8', $_);
+	my %spec_chars = (
+		'\\\"' => "\"",
+		'\\\\' => "\\",
+		'\\\/' => "\/",
+		'\\\b' => "\b",
+		'\\\f' => "\f",
+		'\\\n' => "\n",
+		'\\\r' => "\r",
+		'\\\t' => "\t" 
+	);
 
-		return eval($_);
+	if(/^$string$/){
+		$_ =~ s/^\"//;
+		$_ =~ s/\"$//;
+		
+		for my $key(keys %spec_chars) {
+        	my $value = $spec_chars{$key};
+        	
+        	$_ =~ s/(?<!\\)$key/$value/e;
+    	}
+			
+		$_ =~ s/(?<!\\)\\u([[:xdigit:]]{4})/chr(hex $1)/ge;
+			
+		return $_;
 	}
 		
 	die "Error";
