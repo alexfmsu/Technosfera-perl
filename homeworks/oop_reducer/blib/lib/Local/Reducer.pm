@@ -2,47 +2,29 @@ package Local::Reducer;
 
 use Moose;
 
+use 5.16.0;
 use strict;
 use warnings;
-use 5.16.0;
-
-=encoding utf8
-
-=head1 NAME
-
-Local::Reducer - base abstract reducer
-
-=head1 VERSION
-
-Version 1.00
-
-=cut
-
-has field => (
-	is => 'ro',
-	isa => 'Str',
-);
-
-has source => (
-	is => 'ro',
-	isa => 'Local::Source',
-);
-
-has row_class => (
-	is => 'ro',
-	isa => 'Str',	
-);
-
-has initial_value => (
-	is => 'ro',
-	isa => 'Int',
-);
+use utf8;
 
 our $VERSION = '1.00';
 
+has source => (
+    is => 'ro',
+    isa => 'Local::Source',
+    required => 1
+);
 
-=head1 SYNOPSIS
+has row_class => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1
+);
 
-=cut
+has initial_value => (
+    is => 'ro',
+    isa => 'Int',
+    required => 1
+);
 
 1;
