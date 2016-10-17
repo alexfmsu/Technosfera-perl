@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 
+use FindBin; # added
+use lib "$FindBin::Bin/../lib"; # added
+
 use Test::More tests => 4;
 
 use Local::Reducer::MaxDiff;
