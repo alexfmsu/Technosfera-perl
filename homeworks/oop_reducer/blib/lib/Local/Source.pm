@@ -3,12 +3,12 @@ package Local::Source;
 use Moose;
 
 has array => (
-    is => 'rw',
+    is => 'ro',
     isa => 'ArrayRef',
 );
 
 has 'ind' => (
-    is       => 'rw',
+    is => 'rw',
     default => init_counter()
 );
 
