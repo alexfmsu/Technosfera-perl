@@ -44,13 +44,13 @@ $sum_reducer = $sum_reducer = Local::Reducer::Sum->new(
     initial_value => 0,
 );
 
-$sum_result = $sum_reducer->reduce_n(1);
-is($sum_result, 1, 'sum reduced 1');
-
-$sum_result = $sum_reducer->reduce_n(1);
+$sum_result = $sum_reducer->reduce_n(2);
 is($sum_result, 16, 'sum reduced 1');
 
-$sum_result = $sum_reducer->reduce_all();
-is($sum_result, 16, 'sum reduced all');
+$sum_result = $sum_reducer->reduce_n(1);
+is($sum_result, 30, 'sum reduced 1');
 
-is($sum_reducer->reduced, 16, 'sum reducer saved at the end');
+$sum_result = $sum_reducer->reduce_all();
+is($sum_result, 30, 'sum reduced all');
+
+is($sum_reducer->reduced, 30, 'sum reducer saved at the end');
