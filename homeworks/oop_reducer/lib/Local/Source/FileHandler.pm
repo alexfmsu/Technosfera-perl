@@ -4,7 +4,7 @@ use Moose;
 extends 'Local::Source';
 
 has 'fh' => (
-    is => 'rw',
+    is => 'ro',
     isa => 'FileHandle'
 );
 
@@ -19,6 +19,7 @@ sub BUILD{
     my $fh = $self->{fh};
     
     my @lines = <$fh>;
+    
     $self->{lines} = \@lines;
 
     close($fh);
