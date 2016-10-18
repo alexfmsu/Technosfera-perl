@@ -27,6 +27,6 @@ $sum_result = $sum_reducer->reduce_n(1);
 is($sum_result, 1, 'sum reduced 1');
 is($sum_reducer->reduced, 1, 'sum reducer saved');
 
-my $sum_result2 = $sum_reducer->reduce_all();
-is($sum_result2, 6, 'sum reduced all');
+$sum_result = $sum_reducer->reduce_all();
+is($sum_result, 6, 'sum reduced all');
 is($sum_reducer->reduced, 6, 'sum reducer saved at the end');
