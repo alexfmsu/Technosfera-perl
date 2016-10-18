@@ -159,7 +159,7 @@ C_FILES  =
 O_FILES  = 
 H_FILES  = 
 MAN1PODS = 
-MAN3PODS = lib/Local/Reducer.pm
+MAN3PODS = 
 
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
@@ -184,14 +184,15 @@ PERL_ARCHIVE_AFTER =
 
 TO_INST_PM = lib/Local/Reducer.pm \
 	lib/Local/Reducer/MaxDiff.pm \
+	lib/Local/Reducer/MinMaxAvg.pm \
 	lib/Local/Reducer/Sum.pm \
 	lib/Local/Row.pm \
 	lib/Local/Row/JSON.pm \
 	lib/Local/Row/Simple.pm \
 	lib/Local/Source.pm \
 	lib/Local/Source/Array.pm \
-	lib/Local/Source/Text.pm \
-	oop.pl
+	lib/Local/Source/FileHandler.pm \
+	lib/Local/Source/Text.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -417,10 +418,8 @@ POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"
 POD2MAN = $(POD2MAN_EXE)
 
 
-manifypods : pure_all config  \
-	lib/Local/Reducer.pm
-	$(NOECHO) $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) -u \
-	  lib/Local/Reducer.pm $(INST_MAN3DIR)/Local::Reducer.$(MAN3EXT) 
+manifypods : pure_all config 
+	$(NOECHO) $(NOOP)
 
 
 
@@ -868,14 +867,15 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
 	  'lib/Local/Reducer.pm' 'blib/lib/Local/Reducer.pm' \
 	  'lib/Local/Reducer/MaxDiff.pm' 'blib/lib/Local/Reducer/MaxDiff.pm' \
+	  'lib/Local/Reducer/MinMaxAvg.pm' 'blib/lib/Local/Reducer/MinMaxAvg.pm' \
 	  'lib/Local/Reducer/Sum.pm' 'blib/lib/Local/Reducer/Sum.pm' \
 	  'lib/Local/Row.pm' 'blib/lib/Local/Row.pm' \
 	  'lib/Local/Row/JSON.pm' 'blib/lib/Local/Row/JSON.pm' \
 	  'lib/Local/Row/Simple.pm' 'blib/lib/Local/Row/Simple.pm' \
 	  'lib/Local/Source.pm' 'blib/lib/Local/Source.pm' \
 	  'lib/Local/Source/Array.pm' 'blib/lib/Local/Source/Array.pm' \
-	  'lib/Local/Source/Text.pm' 'blib/lib/Local/Source/Text.pm' \
-	  'oop.pl' '$(INST_LIB)/Local/oop.pl' 
+	  'lib/Local/Source/FileHandler.pm' 'blib/lib/Local/Source/FileHandler.pm' \
+	  'lib/Local/Source/Text.pm' 'blib/lib/Local/Source/Text.pm' 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 
