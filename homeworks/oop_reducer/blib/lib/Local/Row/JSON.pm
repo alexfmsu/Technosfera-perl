@@ -12,7 +12,7 @@ sub get{
     my $str = $self->{str};
 
     my $elem = JSON->new->utf8->decode($str);
-        
+        # print $elem;
     if($elem->{$name}){
         return $elem->{$name};  
     }else{
