@@ -36,7 +36,7 @@ sub set_avg{
 }
 
 sub get_min{
-    my ($self, $value) = @_;
+    my $self = shift;
     
     return $self->min;
 }
@@ -72,13 +72,18 @@ has result => (
     # isa => MinMaxAvgObj
 );
 
+sub set_result{
+    my ($self, $value) = @_;
+
+    $self->{result} = $value;
+}
 
 sub reduce_n{
     my($self, $n) = @_;
 
     $self->source->init_counter();
     
-    $self->{result} = MinMaxAvgObj->new();
+    $self->set_result(MinMaxAvgObj->new());
     undef $self->{result}->{min};
     undef $self->{result}->{max};
         
@@ -88,7 +93,7 @@ sub reduce_n{
     my $initial_value = $self->initial_value;
     
     my $res = $self->result;
-
+    
     my $all_mode = !defined($n); 
     
     $n = 1 if $all_mode;
@@ -122,12 +127,12 @@ sub reduce_n{
             
         $n++ if $all_mode;
     }
-
+    
     $res->set_avg($self->{sum}/$counter);
-
-    $self->{result} = $res;
-
-    $self->{reduced_result} = $res;
+    
+    $self->set_result($res);
+    
+    $self->set_reduced_result($res);
     
     return $res;
 }
@@ -135,14 +140,14 @@ sub reduce_n{
 sub reduce_all{
     my $self = shift;
     
-    $self->{source}->init_counter();
+    $self->source->init_counter();
     
     $self->{sum} = 0;
     
-    $self->{result} = MinMaxAvgObj->new();
+    $self->set_result(MinMaxAvgObj->new());
     undef $self->{result}->{min};
     undef $self->{result}->{max};
-
+    
     return reduce_n($self);
 }
 

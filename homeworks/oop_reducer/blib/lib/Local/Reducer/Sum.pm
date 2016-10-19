@@ -21,16 +21,16 @@ sub reduce_n{
     my $all_mode = !defined($n); 
     
     $n = 1 if $all_mode;
-
+    
     my $counter = 0;
-
+    
     my $res = $self->reduced_result;    
-
+    
     while($counter < $n){
         my $next = $source->next();
         
         last if(!defined($next));
-
+        
         my $row = $row_class->new(str=>$next);
         
         if($row->can('get')){
@@ -38,23 +38,23 @@ sub reduce_n{
         }else{
             die 'Couldn\'t get data';
         }
-
+        
         $counter++;
-
+        
         $n++ if $all_mode;
     }
-
-    $self->{reduced_result} = $res;
+    
+    $self->set_reduced_result($res);
     
     return $res;
 }
 
 sub reduce_all{
     my $self = shift;
-
+    
     $self->set_reduced_result(0);
     $self->source->init_counter();
-
+    
     return reduce_n($self);
 }
 

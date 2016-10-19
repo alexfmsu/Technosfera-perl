@@ -38,7 +38,7 @@ sub reduced{
 }
 
 sub set_reduced_result{
-    my ($self, $value) = shift;
+    my ($self, $value) = @_;
 
     $self->{reduced_result} = $value;
 }
