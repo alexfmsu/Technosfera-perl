@@ -72,6 +72,7 @@ has result => (
     # isa => MinMaxAvgObj
 );
 
+
 sub reduce_n{
     my($self, $n) = @_;
 
@@ -80,13 +81,13 @@ sub reduce_n{
     $self->{result} = MinMaxAvgObj->new();
     undef $self->{result}->{min};
     undef $self->{result}->{max};
+        
+    my $field = $self->field;
+    my $source = $self->source;
+    my $row_class = $self->row_class;
+    my $initial_value = $self->initial_value;
     
-    my $field = $self->{field};
-    my $source = $self->{source};
-    my $row_class = $self->{row_class};
-    my $initial_value = $self->{initial_value};
-    
-    my $res = $self->{result};
+    my $res = $self->result;
 
     my $all_mode = !defined($n); 
     
@@ -104,11 +105,11 @@ sub reduce_n{
         if($row->can('get')){
             my $val = $row->get($field, $initial_value);
 
-            if($counter == 0 || $val < $res->{min}){
+            if($counter == 0 || $val < $res->min){
                 $res->set_min($val);            
             }
 
-            if($counter == 0 || $val > $res->{max}){
+            if($counter == 0 || $val > $res->max){
                 $res->set_max($val);            
             }
 
@@ -121,11 +122,11 @@ sub reduce_n{
             
         $n++ if $all_mode;
     }
-    
+
     $res->set_avg($self->{sum}/$counter);
-    
+
     $self->{result} = $res;
-    
+
     $self->{reduced_result} = $res;
     
     return $res;
@@ -144,6 +145,5 @@ sub reduce_all{
 
     return reduce_n($self);
 }
-
 
 1;
