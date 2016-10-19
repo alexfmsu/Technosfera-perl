@@ -3,36 +3,54 @@ package MinMaxAvgObj;
 use Moose;
 
 has min => (
-    is => 'ro',
+    is => 'rw',
     isa => 'Num'
 );
 
 has max => (
-    is => 'ro',
+    is => 'rw',
     isa => 'Num'
 );
 
 has avg => (
-    is => 'ro',
+    is => 'rw',
     isa => 'Num'
 );
 
-sub get_min{
-    my $self = shift;
+sub set_min{
+    my ($self, $value) = @_;
     
-    return $self->{min};
+    $self->{min} = $value;
+}
+
+sub set_max{
+    my ($self, $value) = @_;
+    
+    $self->{max} = $value;
+}
+
+sub set_avg{
+    my ($self, $value) = @_;
+    
+    $self->{avg} = $value;
+}
+
+sub get_min{
+    my ($self, $value) = @_;
+    
+    return $self->min;
 }
 
 sub get_max{
     my $self = shift;
     
-    return $self->{max};
+    return $self->max;
 }
 
 sub get_avg{
     my $self = shift;
     
-    return $self->{avg};
+    return $self->avg;
 }
 
 # -------------------------------------------------------------------------------------------------
@@ -53,7 +71,6 @@ has result => (
     is => 'rw',
     # isa => MinMaxAvgObj
 );
-
 
 sub reduce_n{
     my($self, $n) = @_;
@@ -88,11 +105,11 @@ sub reduce_n{
             my $val = $row->get($field, $initial_value);
 
             if($counter == 0 || $val < $res->{min}){
-                $res->{min} = $val;
+                $res->set_min($val);            
             }
 
             if($counter == 0 || $val > $res->{max}){
-                $res->{max} = $val;
+                $res->set_max($val);            
             }
 
             $self->{sum} += $val;        
@@ -104,11 +121,11 @@ sub reduce_n{
             
         $n++ if $all_mode;
     }
-
-    $res->{avg} = $self->{sum}/$counter;
-
+    
+    $res->set_avg($self->{sum}/$counter);
+    
     $self->{result} = $res;
-
+    
     $self->{reduced_result} = $res;
     
     return $res;
