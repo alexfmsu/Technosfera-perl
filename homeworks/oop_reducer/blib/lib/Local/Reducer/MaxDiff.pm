@@ -31,8 +31,8 @@ sub reduce_n{
     my $counter = 0;
     
     my $res;
-    if(defined($self->{reduced_result})){
-        $res = $self->{reduced_result};
+    if(defined($self->reduced_result)){
+        $res = $self->reduced_result;
     }else{
         $res = 0;
     }
@@ -60,7 +60,7 @@ sub reduce_n{
         $n++ if $all_mode;
     }
     
-    $self->{reduced_result} = $res;
+    $self->set_reduced_result($res);
     
     return $res;
 }

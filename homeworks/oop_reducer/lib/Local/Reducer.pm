@@ -34,8 +34,22 @@ has reduced_result => (
 sub reduced{
     my $self = shift;
 
-    return $self->{reduced_result};
+    return $self->reduced_result;
 }
+
+sub set_reduced_result{
+    my ($self, $value) = shift;
+    
+    $self->{reduced_result} = $value;
+}
+
+sub set_source{
+    my ($self, $value) = shift;
+    
+    $self->set_source($value);
+}
+
+
 
 
 1;

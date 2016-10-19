@@ -14,9 +14,9 @@ sub reduce_n{
     my($self, $n, $all) = @_;
     
     my $field = $self->field;
-    my $source = $self->{source};
-    my $row_class = $self->{row_class};
-    my $initial_value = $self->{initial_value};
+    my $source = $self->source;
+    my $row_class = $self->row_class;
+    my $initial_value = $self->initial_value;
     
     my $all_mode = !defined($n); 
     
@@ -24,7 +24,8 @@ sub reduce_n{
 
     my $counter = 0;
 
-    my $res = $self->{reduced_result};    
+    my $res = $self->reduced_result;    
+
     while($counter < $n){
         my $next = $source->next();
         
@@ -51,11 +52,10 @@ sub reduce_n{
 sub reduce_all{
     my $self = shift;
 
-    $self->{reduced_result} = 0;
-    $self->{source}->init_counter();
+    $self->set_reduced_result(0);
+    $self->source->init_counter();
 
     return reduce_n($self);
 }
-
 
 1;
