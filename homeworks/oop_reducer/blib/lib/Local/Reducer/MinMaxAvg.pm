@@ -76,7 +76,7 @@ has result => (
 sub reduce_n{
     my($self, $n) = @_;
 
-    $self->{source}->init_counter();
+    $self->source->init_counter();
     
     $self->{result} = MinMaxAvgObj->new();
     undef $self->{result}->{min};
