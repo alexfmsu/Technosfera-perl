@@ -67,10 +67,21 @@ has field => (
     required => 1
 );
 
+has sum => (
+    is => 'rw',
+    isa => 'Num'
+);
+
 has result => (
     is => 'rw',
     # isa => MinMaxAvgObj
 );
+
+sub set_sum{
+    my ($self, $value) = @_;
+
+    $self->{sum} = $value;
+}
 
 sub set_result{
     my ($self, $value) = @_;
@@ -93,12 +104,14 @@ sub reduce_n{
     my $initial_value = $self->initial_value;
     
     my $res = $self->result;
-    
+
     my $all_mode = !defined($n); 
     
     $n = 1 if $all_mode;
     
     my $counter = 0;
+
+    my $sum = $self->sum;
     
     while($counter < $n){
         my $next = $source->next();
@@ -118,7 +131,7 @@ sub reduce_n{
                 $res->set_max($val);            
             }
 
-            $self->{sum} += $val;        
+            $sum += $val;        
         }else{
             die 'Couldn\'t get data';
         }
@@ -127,11 +140,11 @@ sub reduce_n{
             
         $n++ if $all_mode;
     }
-    
-    $res->set_avg($self->{sum}/$counter);
-    
+
+    $res->set_avg($sum/$counter);
+
     $self->set_result($res);
-    
+
     $self->set_reduced_result($res);
     
     return $res;
@@ -142,12 +155,12 @@ sub reduce_all{
     
     $self->source->init_counter();
     
-    $self->{sum} = 0;
+    $self->set_sum(0);
     
     $self->set_result(MinMaxAvgObj->new());
     undef $self->{result}->{min};
     undef $self->{result}->{max};
-    
+
     return reduce_n($self);
 }
 
