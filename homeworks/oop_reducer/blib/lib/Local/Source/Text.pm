@@ -4,46 +4,32 @@ use Moose;
 
 extends 'Local::Source';
 
-has 'text' => (
+has text => (
     is => 'ro',
     isa => 'Str',
     required => 1
 );
 
-has 'delimiter' => (
+has delimiter => (
     is => 'ro',
     isa => 'Str',
     default => '\n'
 );
 
-has 'lines' => (
-    is => 'ro',
-    isa => 'ArrayRef'
+has '+array' => (
+    lazy_build => 1,
+    builder => 'split_text'
 );
 
-sub BUILD{
+sub split_text{
     my $self = shift;
-
-    my $delimiter = $self->{delimiter};
-
-    my @lines = split(/$delimiter/, $self->{text});
     
-    $self->{lines} = \@lines;
+    my $delimiter = $self->delimiter;
+
+    my @lines = split(/$delimiter/, $self->text);
+    
+    return \@lines;
 };
-
-sub next{
-    my $self = shift;
-    
-    my $lines = $self->{lines};
-    
-    my $ind = \($self->{ind});
-    
-    if(@$lines && $$ind < scalar @$lines){ 
-        return @$lines[$$ind++];
-    }else{
-        return undef;
-    }
-}
 
 1;
 

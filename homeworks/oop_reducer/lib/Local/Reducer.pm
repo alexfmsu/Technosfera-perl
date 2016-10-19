@@ -27,4 +27,15 @@ has initial_value => (
     required => 1
 );
 
+has reduced_result => (
+    is => 'ro'
+);
+
+sub reduced{
+    my $self = shift;
+
+    return $self->{reduced_result};
+}
+
+
 1;

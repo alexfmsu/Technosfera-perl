@@ -4,33 +4,40 @@ use Moose;
 
 extends 'Local::Reducer';
 
-has 'top' => (
+has top => (
     is => 'ro',
     isa => 'Str'
 );
 
-has 'bottom' => (
+has bottom => (
     is => 'ro',
     isa => 'Str'
-);
-
-has 'max_diff' => (
-    is => 'ro',
-    isa => 'Int',
-    default => 0
 );
 
 sub reduce_n{
     my($self, $n) = @_;
     
-    my $top = $self->{top};
-    my $bottom = $self->{bottom};
+    my $top = $self->top;
+    my $bottom = $self->bottom;
     
-    my $source = $self->{source};
-    my $row_class = $self->{row_class};
-    my $initial_value = $self->{initial_value};
+    my $source = $self->source;
+    my $row_class = $self->row_class;
+    my $initial_value = $self->initial_value;
     
-    for(1..$n){
+    my $all_mode = !defined($n);
+    
+    $n = 1 if $all_mode;
+    
+    my $counter = 0;
+    
+    my $res;
+    if(defined($self->{reduced_result})){
+        $res = $self->{reduced_result};
+    }else{
+        $res = 0;
+    }
+    
+    while($counter < $n){
         my $next = $source->next();
         
         last if(!defined($next));
@@ -43,58 +50,19 @@ sub reduce_n{
         
             my $diff = abs($top_val - $bottom_val);
         
-            $self->{max_diff} = $diff if($diff > $self->{max_diff});
+            $res = $diff if($diff > $res);
         }else{
             die 'Couldn\'t get data';
         }
+
+        $counter++;
+
+        $n++ if $all_mode;
     }
     
-    return $self->{max_diff};
-}
-
-before 'reduce_all' => sub{
-    my $self = shift;
-
-    $self->{max_diff} = 0;
-    $self->{source}->init_counter();
-};
-
-sub reduce_all{
-    my($self, $n) = @_;
+    $self->{reduced_result} = $res;
     
-    my $top = $self->{top};
-    my $bottom = $self->{bottom};
-    
-    my $source = $self->{source};
-    my $row_class = $self->{row_class};
-    my $initial_value = $self->{initial_value};
-    
-    while(1){
-        my $next = $source->next();
-        
-        last if(!defined($next));
-
-        my $row = $row_class->new(str=>$next);
-        
-        if($row->can('get')){
-           my $top_val = $row->get($top, $initial_value);
-            my $bottom_val = $row->get($bottom, $initial_value);
-            
-            my $diff = abs($top_val - $bottom_val);
-            
-            $self->{max_diff} = $diff if($diff > $self->{max_diff});
-        }else{
-            die 'Couldn\'t get data';
-        }
-    }
-
-    return $self->{max_diff};
-}
-
-sub reduced{
-    my $self = shift;
-
-    return $self->{max_diff};
+    return $res;
 }
 
 1;

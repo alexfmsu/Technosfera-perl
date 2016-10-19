@@ -3,39 +3,27 @@ use Moose;
 
 extends 'Local::Source';
 
-has 'fh' => (
+has fh => (
     is => 'ro',
-    isa => 'FileHandle'
+    isa => 'FileHandle',
+    required => 1
 );
 
-has 'lines' => (
-    is => 'rw',
-    isa => 'ArrayRef'
+has '+array' => (
+    lazy_build => 1,
+    builder => 'split_file'
 );
 
-sub BUILD{
+sub split_file{
     my $self = shift;
 
-    my $fh = $self->{fh};
+    my $fh = $self->fh;
     
     my @lines = <$fh>;
     
-    $self->{lines} = \@lines;
-
     close($fh);
-}
 
-sub next{
-    my $self = shift;
-    
-    my $ind = \($self->{ind});
-    my $lines = $self->{lines};
-        
-    if(@$lines && $$ind < scalar @$lines){
-        return @$lines[$$ind++];
-    }else{
-        return undef;
-    }
+    return \@lines;
 }
 
 1;

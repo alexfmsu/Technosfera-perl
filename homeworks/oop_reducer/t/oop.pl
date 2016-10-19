@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-
+use DDP;
 use Test::More tests => 1;
 
 use FindBin; # added
@@ -20,10 +20,16 @@ my $diff_reducer = Local::Reducer::MaxDiff->new(
 
 my $diff_result;
 
+
+# p $diff_reducer->source->get_array();
 $diff_result = $diff_reducer->reduce_n(1);
 is($diff_result, 1024, 'diff reduced 1024');
-# is($diff_reducer->reduced, 1024, 'diff reducer saved');
+is($diff_reducer->reduced, 1024, 'diff reducer saved');
 
 # $diff_result = $diff_reducer->reduce_all();
 # is($diff_result, 8192, 'diff reduced all');
 # is($diff_reducer->reduced, 8192, 'diff reducer saved at the end');
+    
+# my $t = Local::Source::Text->new(text =>"sended:1024,received:2048\nsended:2048,received:10240");
+
+# p $t->get_array();

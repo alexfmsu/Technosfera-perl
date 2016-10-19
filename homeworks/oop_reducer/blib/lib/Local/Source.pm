@@ -4,12 +4,12 @@ use Moose;
 
 has array => (
     is => 'ro',
-    isa => 'ArrayRef',
+    isa => 'ArrayRef'
 );
 
-has 'ind' => (
+has ind => (
     is => 'rw',
-    default => init_counter()
+    builder => 'init_counter'
 );
 
 sub init_counter{
@@ -18,5 +18,18 @@ sub init_counter{
     $self->{ind} = 0;
 };
 
+sub next{
+    my $self = shift;
+
+    my $arr = $self->array;
+
+    my $ind = \($self->{ind});
+    
+    if($$ind < scalar @$arr){
+        return @$arr[$$ind++];
+    }else{
+        return undef;
+    }
+}
 
 1;
