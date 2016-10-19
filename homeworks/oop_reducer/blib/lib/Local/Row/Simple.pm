@@ -7,7 +7,7 @@ extends 'Local::Row';
 sub get{
     my($self, $name, $default) = @_;
         
-    my $str = $self->{str};
+    my $str = $self->str;
     
     my %h = ();
 
@@ -28,7 +28,7 @@ sub get{
     for my $keys(%h){
         return $h{$name} if($keys eq $name);
     }
-        
+    
     return $default;        
 }
 

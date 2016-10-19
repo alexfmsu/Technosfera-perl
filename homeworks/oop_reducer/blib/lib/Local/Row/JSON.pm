@@ -10,7 +10,7 @@ sub get{
     my($self, $name, $default) = @_;
     
     my $str = $self->str;
-
+    
     my $elem = JSON->new->utf8->decode($str);
     
     if($elem->{$name}){
