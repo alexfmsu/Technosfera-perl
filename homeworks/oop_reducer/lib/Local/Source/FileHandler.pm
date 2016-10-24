@@ -22,18 +22,14 @@ has '+array' => (
 
 sub split_file{
     my $self = shift;
-
+    
     my $fh = $self->fh;
     
     my @lines = <$fh>;
     
     close($fh);
 
-    for(@lines){
-        $_ = $self->row_class->new(str=>$_);
-    }
-
-    return \@lines;
+    return $self->pack_to_row(\@lines);
 }
 
 1;

@@ -18,13 +18,7 @@ has '+array' => (
 sub split_text{
     my $self = shift;
     
-    my $arr = $self->array;
-    
-    for(@$arr){
-        $_ = $self->row_class->new(str=>$_);
-    }
-
-    return $arr;
+    return $self->pack_to_row($self->array);
 };
 
 1;

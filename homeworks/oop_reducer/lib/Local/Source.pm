@@ -30,6 +30,16 @@ sub set_row_class{
     $self->{row_class} = $row_class;
 }
 
+sub pack_to_row{
+    my ($self, $arr) = @_;
+    
+    for(@$arr){
+        $_ = $self->row_class->new(str=>$_);
+    }
+
+    return \@$arr;
+}
+
 sub next{
     my $self = shift;
     
