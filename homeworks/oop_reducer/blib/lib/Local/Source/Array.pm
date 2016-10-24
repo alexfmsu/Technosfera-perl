@@ -9,8 +9,8 @@ use Moose;
 
 extends 'Local::Source';
 
-has +array => (
-    lazy_build => 1,
+has '+array' => (
+    lazy => 1,
     builder => 'split_array'
 );
 

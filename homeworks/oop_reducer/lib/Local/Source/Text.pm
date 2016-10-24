@@ -22,7 +22,7 @@ has delimiter => (
 );
 
 has '+array' => (
-    lazy_build => 1,
+    lazy => 1,
     builder => 'split_text'
 );
 
