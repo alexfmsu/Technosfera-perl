@@ -9,13 +9,12 @@ use Moose;
 
 extends 'Local::Source';
 
-has '+array' => (
-    lazy => 1,
+has +array => (
     lazy_build => 1,
-    builder => 'split_text'
+    builder => 'split_array'
 );
 
-sub split_text{
+sub split_array{
     my $self = shift;
     
     return $self->pack_to_row($self->array);

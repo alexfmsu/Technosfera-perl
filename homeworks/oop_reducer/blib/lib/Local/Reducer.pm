@@ -71,9 +71,12 @@ sub reduce_n{
     # CRUTCH==================================================
     $source->set_row_class($row_class);
     if(ref $source eq 'Local::Source::Array' && $crutch == 0){
-        $source->split_text();
+        $source->split_array();
         $crutch++;
     }
+    # my $a = $source->array;
+    # use DDP;
+    # p $a;
     # CRUTCH==================================================
 
     while($counter < $n){

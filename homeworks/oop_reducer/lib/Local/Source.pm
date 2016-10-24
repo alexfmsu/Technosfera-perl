@@ -11,7 +11,7 @@ use Local::Row;
 
 has array => (
     is => 'rw',
-    isa => 'ArrayRef',
+    isa => 'ArrayRef'
 );
 
 has ind => (
@@ -26,7 +26,7 @@ has row_class => (
 
 sub set_row_class{
     my ($self, $row_class) = @_;
-
+    
     $self->{row_class} = $row_class;
 }
 
@@ -36,7 +36,7 @@ sub pack_to_row{
     for(@$arr){
         $_ = $self->row_class->new(str=>$_);
     }
-
+    
     return \@$arr;
 }
 
