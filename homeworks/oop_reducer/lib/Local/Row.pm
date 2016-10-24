@@ -24,11 +24,7 @@ sub get{
 
     my $val = $h->{$name};
 
-    if(defined($val)){
-        return $val;
-    }else{
-        return $default;        
-    }
+    return defined($val) ? $val : $default;
 }
 
 
