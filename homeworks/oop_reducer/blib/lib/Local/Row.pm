@@ -22,11 +22,13 @@ sub get{
 
     my $h = $self->data;
 
-    for my $key(keys %$h){
-        return $h->{$key} if($key eq $name);
+    my $val = $h->{$name};
+
+    if(defined($val)){
+        return $val;
+    }else{
+        return $default;        
     }
-    
-    return $default;        
 }
 
 
