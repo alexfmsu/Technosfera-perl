@@ -33,7 +33,7 @@ sub split_text{
 
     my @lines = split(/$delimiter/, $self->text);
     
-    return $self->pack_to_row(\@lines);
+    return \@lines;
 };
 
 1;

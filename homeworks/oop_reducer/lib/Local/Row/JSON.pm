@@ -13,10 +13,10 @@ use JSON;
 
 has '+data' => (
     lazy_build => 1,
-    builder => 'hash_builder'
+    builder => 'data_builder'
 );
 
-sub hash_builder{
+sub data_builder{
     my $self = shift;
 
     my $str = $self->str;

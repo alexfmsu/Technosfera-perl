@@ -29,7 +29,7 @@ sub split_file{
     
     close($fh);
 
-    return $self->pack_to_row(\@lines);
+    return \@lines;
 }
 
 1;

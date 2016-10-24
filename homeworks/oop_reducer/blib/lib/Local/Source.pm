@@ -24,22 +24,6 @@ has row_class => (
     isa => 'Str'
 );
 
-sub set_row_class{
-    my ($self, $row_class) = @_;
-    
-    $self->{row_class} = $row_class;
-}
-
-sub pack_to_row{
-    my ($self, $arr) = @_;
-    
-    for(@$arr){
-        $_ = $self->row_class->new(str=>$_);
-    }
-    
-    return \@$arr;
-}
-
 sub next{
     my $self = shift;
     

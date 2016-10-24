@@ -16,14 +16,16 @@ has field => (
 );
 
 sub reduce_step{
-    my($self, $next, $initial_value) = @_;
+    my($self, $next, $row_class, $initial_value) = @_;
     
     my $field = $self->field;
     
     my $res = $self->tmp_reduced_result;
     
-    if($next->can('get')){
-        $res += $next->get($field, $initial_value);
+    my $row = $row_class->new(str=>$next);
+
+    if($row->can('get')){
+        $res += $row->get($field, $initial_value);
     }else{
         die "Can't get data\n";
     }

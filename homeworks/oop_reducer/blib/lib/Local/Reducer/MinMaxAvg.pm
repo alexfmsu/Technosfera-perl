@@ -72,7 +72,7 @@ has tmp_reduced_result => (
 );
 
 sub reduce_step{
-    my($self, $row, $initial_value) = @_;
+    my($self, $next, $row_class, $initial_value) = @_;
     
     my $field = $self->field;
      
@@ -82,6 +82,8 @@ sub reduce_step{
     
     my $reduced_count = $self->reduced_count;
     
+    my $row = $row_class->new(str=>$next);
+
     if($row->can('get')){
         my $val = $row->get($field, $initial_value);
         

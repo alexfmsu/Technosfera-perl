@@ -68,23 +68,12 @@ sub reduce_n{
     
     my $counter = 0;
     
-    # CRUTCH==================================================
-    $source->set_row_class($row_class);
-    if(ref $source eq 'Local::Source::Array' && $crutch == 0){
-        # $source->split_array();
-        # $crutch++;
-    }
-    # my $a = $source->array;
-    # use DDP;
-    # p $a;
-    # CRUTCH==================================================
-
     while($counter < $n){
         my $next = $source->next();
         
         last if(!defined($next));
-
-        $self->reduce_step($next, $initial_value);
+        
+        $self->reduce_step($next, $row_class, $initial_value);
         
         $self->reduced_count($self->reduced_count + 1);
         $counter++;
