@@ -1,31 +1,43 @@
+use 5.16.0;
+use strict;
+use warnings;
+use utf8;
+
 package Local::Source;
 
 use Moose;
 
+use Local::Row;
+
 has array => (
-    is => 'ro',
-    isa => 'ArrayRef'
+    is => 'rw',
+    isa => 'ArrayRef',
 );
 
 has ind => (
     is => 'rw',
-    builder => 'init_counter'
+    default => 0
 );
 
-sub init_counter{
-    my $self = shift;
+has row_class => (
+    is => 'ro',
+    isa => 'Str'
+);
 
-    $self->{ind} = 0;
-};
+sub set_row_class{
+    my ($self, $row_class) = @_;
+
+    $self->{row_class} = $row_class;
+}
 
 sub next{
     my $self = shift;
-
+    
     my $arr = $self->array;
-
+    
     my $ind = \($self->{ind});
     
-    if($$ind < scalar @$arr){
+    if(@$arr && $$ind < scalar @$arr){
         return @$arr[$$ind++];
     }else{
         return undef;

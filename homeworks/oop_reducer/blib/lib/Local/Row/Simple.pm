@@ -1,16 +1,26 @@
+use 5.16.0;
+use strict;
+use warnings;
+use utf8;
+
 package Local::Row::Simple;
 
 use Moose;
 
 extends 'Local::Row';
 
-sub get{
-    my($self, $name, $default) = @_;
-        
-    my $str = $self->str;
-    
-    my %h = ();
+has '+h' => (
+    lazy_build => 1,
+    builder => 'h_builder'
+);
 
+sub h_builder{
+    my $self = shift;
+
+    my $str = $self->str;
+
+    my %h = ();
+    
     $str =~ m{
         ^
         (?:
@@ -24,12 +34,10 @@ sub get{
         )*
         $
     }x;
-        
-    for my $keys(%h){
-        return $h{$name} if($keys eq $name);
-    }
     
-    return $default;        
+    $h{$+{key}} = $+{value};
+    
+    return \%h;
 }
 
 1;

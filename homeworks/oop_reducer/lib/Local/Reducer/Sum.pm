@@ -1,3 +1,8 @@
+use 5.16.0;
+use strict;
+use warnings;
+use utf8;
+
 package Local::Reducer::Sum;
 
 use Moose;
@@ -10,52 +15,22 @@ has field => (
     required => 1
 );
 
-sub reduce_n{
-    my($self, $n, $all) = @_;
+sub reduce_step{
+    my($self, $next, $initial_value) = @_;
     
     my $field = $self->field;
-    my $source = $self->source;
-    my $row_class = $self->row_class;
-    my $initial_value = $self->initial_value;
     
-    my $all_mode = !defined($n); 
+    my $res = $self->tmp_reduced_result;
     
-    $n = 1 if $all_mode;
-    
-    my $counter = 0;
-    
-    my $res = $self->reduced_result;    
-    
-    while($counter < $n){
-        my $next = $source->next();
-        
-        last if(!defined($next));
-        
-        my $row = $row_class->new(str=>$next);
-        
-        if($row->can('get')){
-            $res += $row->get($field, $initial_value);
-        }else{
-            die 'Couldn\'t get data';
-        }
-        
-        $counter++;
-        
-        $n++ if $all_mode;
+    if($next->can('get')){
+        $res += $next->get($field, $initial_value);
+    }else{
+        die "Can't get data\n";
     }
     
-    $self->set_reduced_result($res);
-    
-    return $res;
+    $self->tmp_reduced_result($res);
 }
 
-sub reduce_all{
-    my $self = shift;
-    
-    $self->set_reduced_result(0);
-    $self->source->init_counter();
-    
-    return reduce_n($self);
-}
+sub process_result{}
 
 1;

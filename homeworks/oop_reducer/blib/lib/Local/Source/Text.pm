@@ -1,3 +1,8 @@
+use 5.16.0;
+use strict;
+use warnings;
+use utf8;
+
 package Local::Source::Text;
 
 use Moose;
@@ -28,6 +33,11 @@ sub split_text{
 
     my @lines = split(/$delimiter/, $self->text);
     
+    
+    for(@lines){
+        $_ = $self->row_class->new(str=>$_);
+    }
+
     return \@lines;
 };
 

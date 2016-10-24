@@ -1,39 +1,26 @@
+use 5.16.0;
+use strict;
+use warnings;
+use utf8;
+
 package MinMaxAvgObj;
 
 use Moose;
 
 has min => (
     is => 'rw',
-    isa => 'Num'
+    isa => 'Num',
 );
 
 has max => (
     is => 'rw',
-    isa => 'Num'
+    isa => 'Num',
 );
 
 has avg => (
     is => 'rw',
     isa => 'Num'
 );
-
-sub set_min{
-    my ($self, $value) = @_;
-    
-    $self->{min} = $value;
-}
-
-sub set_max{
-    my ($self, $value) = @_;
-    
-    $self->{max} = $value;
-}
-
-sub set_avg{
-    my ($self, $value) = @_;
-    
-    $self->{avg} = $value;
-}
 
 sub get_min{
     my $self = shift;
@@ -69,99 +56,69 @@ has field => (
 
 has sum => (
     is => 'rw',
-    isa => 'Num'
+    isa => 'Num',
+    default => 0
 );
 
-has result => (
+has reduced_result => (
     is => 'rw',
-    # isa => MinMaxAvgObj
+    isa => 'MinMaxAvgObj'
 );
 
-sub set_sum{
-    my ($self, $value) = @_;
+has tmp_reduced_result => (
+    is => 'rw',
+    isa => 'MinMaxAvgObj',
+    default => sub{ return MinMaxAvgObj->new(); }
+);
 
-    $self->{sum} = $value;
-}
-
-sub set_result{
-    my ($self, $value) = @_;
-
-    $self->{result} = $value;
-}
-
-sub reduce_n{
-    my($self, $n) = @_;
-
-    $self->source->init_counter();
+sub reduce_step{
+    my($self, $row, $initial_value) = @_;
     
-    $self->set_result(MinMaxAvgObj->new());
-    undef $self->{result}->{min};
-    undef $self->{result}->{max};
-        
     my $field = $self->field;
-    my $source = $self->source;
-    my $row_class = $self->row_class;
-    my $initial_value = $self->initial_value;
+     
+    my $res = $self->tmp_reduced_result;
     
-    my $res = $self->result;
-
-    my $all_mode = !defined($n); 
-    
-    $n = 1 if $all_mode;
-    
-    my $counter = 0;
-
     my $sum = $self->sum;
     
-    while($counter < $n){
-        my $next = $source->next();
-        
-        last if(!defined($next));
-
-        my $row = $row_class->new(str=>$next);
-        
-        if($row->can('get')){
-            my $val = $row->get($field, $initial_value);
-
-            if($counter == 0 || $val < $res->min){
-                $res->set_min($val);            
-            }
-
-            if($counter == 0 || $val > $res->max){
-                $res->set_max($val);            
-            }
-
-            $sum += $val;        
-        }else{
-            die 'Couldn\'t get data';
-        }
-
-        $counter++;
-            
-        $n++ if $all_mode;
-    }
-
-    $res->set_avg($sum/$counter);
-
-    $self->set_result($res);
-
-    $self->set_reduced_result($res);
+    my $reduced_count = $self->reduced_count;
     
-    return $res;
+    if($row->can('get')){
+        my $val = $row->get($field, $initial_value);
+        
+        if($reduced_count == 0 || $val < $res->min){
+            $res->min($val);            
+        }
+        
+        if($reduced_count == 0 || $val > $res->max){
+            $res->max($val);            
+        }
+        
+        $sum += $val; 
+        
+        $self->sum($sum);       
+    }else{
+        die "Can't get data";
+    }
+    
+    $self->tmp_reduced_result($res);
 }
 
-sub reduce_all{
+sub process_result{
     my $self = shift;
     
-    $self->source->init_counter();
+    my $res = $self->tmp_reduced_result;
     
-    $self->set_sum(0);
+    my $sum = $self->sum;
     
-    $self->set_result(MinMaxAvgObj->new());
-    undef $self->{result}->{min};
-    undef $self->{result}->{max};
-
-    return reduce_n($self);
+    my $reduced_count = $self->reduced_count;
+    
+    if($reduced_count != 0){
+        $res->avg($sum/$reduced_count);
+    }else{
+        $res = undef;
+    }
+    
+    $self->tmp_reduced_result($res);
 }
 
 1;

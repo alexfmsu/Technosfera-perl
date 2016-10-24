@@ -24,19 +24,19 @@ my $min_max_avg_reducer = Local::Reducer::MinMaxAvg->new(
 my $min_max_avg_result;
 
 $min_max_avg_result = $min_max_avg_reducer->reduce_n(2);
-is($min_max_avg_result->get_min, 1, 'min_max_avg reduced_min 1');
-is($min_max_avg_result->get_max, 2, 'min_max_avg reduced_max 2');
-is($min_max_avg_result->get_avg, 1.5, 'min_max_avg reduced_avg 1.5');
+is($min_max_avg_result->min, 1, 'min_max_avg reduced_min 1');
+is($min_max_avg_result->max, 2, 'min_max_avg reduced_max 2');
+is($min_max_avg_result->avg, 1.5, 'min_max_avg reduced_avg 1.5');
 
-is($min_max_avg_reducer->reduced->get_min, 1, 'min_max_avg reducer_min saved');
-is($min_max_avg_reducer->reduced->get_max, 2, 'min_max_avg reducer_max saved');
-is($min_max_avg_reducer->reduced->get_avg, 1.5, 'min_max_avg reducer_avg saved');
+is($min_max_avg_reducer->reduced->min, 1, 'min_max_avg reducer_min saved');
+is($min_max_avg_reducer->reduced->max, 2, 'min_max_avg reducer_max saved');
+is($min_max_avg_reducer->reduced->avg, 1.5, 'min_max_avg reducer_avg saved');
 
 $min_max_avg_result = $min_max_avg_reducer->reduce_all();
-is($min_max_avg_result->get_min, 1, 'min_max_avg reducer_all_min');
-is($min_max_avg_result->get_max, 3, 'min_max_avg reducer_all_max');
-is($min_max_avg_result->get_avg, 2, 'min_max_avg reducer_all_avg');
+is($min_max_avg_result->min, 1, 'min_max_avg reducer_all_min');
+is($min_max_avg_result->max, 3, 'min_max_avg reducer_all_max');
+is($min_max_avg_result->avg, 2, 'min_max_avg reducer_all_avg');
 
-is($min_max_avg_reducer->reduced->get_min, 1, 'min_max_avg reducer_all_min');
-is($min_max_avg_reducer->reduced->get_max, 3, 'min_max_avg reducer_all_max');
-is($min_max_avg_reducer->reduced->get_avg, 2, 'min_max_avg reducer_all_avg');
+is($min_max_avg_reducer->reduced->min, 1, 'min_max_avg reducer_all_min');
+is($min_max_avg_reducer->reduced->max, 3, 'min_max_avg reducer_all_max');
+is($min_max_avg_reducer->reduced->avg, 2, 'min_max_avg reducer_all_avg');

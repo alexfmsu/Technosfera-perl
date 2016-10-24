@@ -1,4 +1,10 @@
+use 5.16.0;
+use strict;
+use warnings;
+use utf8;
+
 package Local::Source::FileHandler;
+
 use Moose;
 
 extends 'Local::Source';
@@ -22,6 +28,10 @@ sub split_file{
     my @lines = <$fh>;
     
     close($fh);
+
+    for(@lines){
+        $_ = $self->row_class->new(str=>$_);
+    }
 
     return \@lines;
 }

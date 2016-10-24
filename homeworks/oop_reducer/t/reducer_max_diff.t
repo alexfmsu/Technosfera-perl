@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More tests => 4;
 
 use FindBin; # added
 use lib "$FindBin::Bin/../lib"; # added
@@ -22,8 +22,8 @@ my $diff_result;
 
 $diff_result = $diff_reducer->reduce_n(1);
 is($diff_result, 1024, 'diff reduced 1024');
-# is($diff_reducer->reduced, 1024, 'diff reducer saved');
+is($diff_reducer->reduced, 1024, 'diff reducer saved');
 
-# $diff_result = $diff_reducer->reduce_all();
-# is($diff_result, 8192, 'diff reduced all');
-# is($diff_reducer->reduced, 8192, 'diff reducer saved at the end');
+$diff_result = $diff_reducer->reduce_all();
+is($diff_result, 8192, 'diff reduced all');
+is($diff_reducer->reduced, 8192, 'diff reducer saved at the end');
