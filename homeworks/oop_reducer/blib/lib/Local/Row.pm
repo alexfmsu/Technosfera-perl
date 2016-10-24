@@ -12,7 +12,7 @@ has str => (
     isa => 'Str',
 );
 
-has h => (
+has data => (
     is => 'rw',
     isa => 'HashRef',
 );
@@ -20,7 +20,7 @@ has h => (
 sub get{
     my($self, $name, $default) = @_;
 
-    my $h = $self->h;
+    my $h = $self->data;
 
     for my $key(keys %$h){
         return %$h{$name} if($key eq $name);

@@ -9,12 +9,12 @@ use Moose;
 
 extends 'Local::Row';
 
-has '+h' => (
+has '+data' => (
     lazy_build => 1,
-    builder => 'h_builder'
+    builder => 'hash_builder'
 );
 
-sub h_builder{
+sub hash_builder{
     my $self = shift;
 
     my $str = $self->str;
