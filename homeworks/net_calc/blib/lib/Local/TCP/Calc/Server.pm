@@ -186,19 +186,15 @@ sub check_queue_workers{
             cur_task_id=>$id,
             max_forks=>$max_forks_per_task,
             calc_ref=> sub{
-                use Math::Expression;
+                use Local::Calculator::RPN;
+                use Local::Calculator::Evaluate;
                 
                 my $expr = shift;
                 
-                my $env = Math::Expression->new;
+                my $rpn = Local::Calculator::RPN::rpn($expr);
+                my $a = Local::Calculator::Evaluate::evaluate($rpn);
                 
-                my $result = $env->ParseString($expr);
-                
-                if(defined($result)){
-                    $result = $env->EvalToScalar($result);
-                }
-                
-                return defined($result) ? $result : "NaN";
+                return $a;
             }
         );
         

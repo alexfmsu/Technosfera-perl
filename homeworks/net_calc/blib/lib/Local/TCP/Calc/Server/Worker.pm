@@ -13,6 +13,9 @@ use POSIX;
 use Fcntl qw(:flock);
 use PerlIO::gzip;
 
+use Local::Calculator::RPN;
+use Local::Calculator::Evaluate;
+
 has cur_task_id => (is => 'ro', isa => 'Int', required => 1);
 has forks       => (is => 'rw', isa => 'ArrayRef', default => sub {return []});
 has calc_ref    => (is => 'ro', isa => 'CodeRef', required => 1);
@@ -95,9 +98,9 @@ sub start{
         } 
         
         if(defined($child)){
-            my $result = ($self->{calc_ref})->($expr);
+            my $res = $self->{calc_ref}($expr);
             
-            $self->write_res($result, $fh_out);
+            $self->write_res($res, $fh_out);
             
             exit(0);
         }else{
