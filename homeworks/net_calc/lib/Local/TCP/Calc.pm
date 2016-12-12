@@ -78,7 +78,7 @@ sub get_header{
     my $bytes_read = $socket->sysread($packed_header, $packed_header_size);
     
     if(!defined($bytes_read) || $bytes_read != $packed_header_size){
-        drop_connection($socket);
+        return -1;
     }
     
     return __PACKAGE__->unpack_header($packed_header);
@@ -110,7 +110,7 @@ sub get_request{
     my ($type, $packed_message_size) = get_header($socket);
     
     if(!defined($type) || !defined($packed_message_size)){
-        drop_connection($socket, "Error: can't get request");
+        return -1;
     }
     
     my $message = get_message($socket, $packed_message_size);
@@ -124,7 +124,9 @@ sub send_request{
     my $type = shift;
     
     if(!defined($type)){
-        drop_connection($socket, "Error: can't send request");    
+        warn("\n\nError: can't send request\n\n");
+
+        return -1;
     }
     
     my $packed_message = __PACKAGE__->pack_message($message);
@@ -136,25 +138,12 @@ sub send_request{
     my $bytes_write = $socket->syswrite($packed_all, $packed_all_size);
     
     if(!defined($bytes_write) || $bytes_write != $packed_all_size){
-        drop_connection($socket, "Error: can't send request");
-    }
-}
-# -------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------
-sub WARN{
-    my $msg = shift;
-    
-    warn "\n\n"."[CALC] ".$msg."\n\n";
-}
+        warn("\n\nError: can't send request\n\n");
 
-sub drop_connection{
-    my $socket = shift;
-    my $err_msg = shift;
-    
-    WARN($err_msg) if defined($err_msg);
-    
-    close($socket);
-    exit(1);
+        return -1;
+    }
+
+    return 0;
 }
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------

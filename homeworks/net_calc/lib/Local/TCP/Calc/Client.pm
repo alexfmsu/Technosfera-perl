@@ -46,30 +46,16 @@ sub do_request{
     my $type = shift;
     my $message = shift;
     
-    send_request($server, $message, $type);
+    my $snd = send_request($server, $message, $type);
     
+    if($snd == -1){
+        close($server);
+        exit(0);
+    }
+
     my ($status, $struct) = get_request($server);
     
     return @$struct;
 }
-# -------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------
-sub WARN{
-    my $msg = shift;
-    
-    warn "\n\n"."[CLIENT] ".$msg."\n\n";
-}
-
-sub drop_connection{
-    my $socket = shift;
-    my $err_msg = shift;
-    
-    WARN($err_msg) if defined($err_msg);
-    
-    close($socket);
-    exit(1);
-}
-# -------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------
 
 1;

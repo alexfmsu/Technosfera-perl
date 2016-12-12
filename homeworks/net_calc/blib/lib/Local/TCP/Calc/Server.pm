@@ -80,7 +80,7 @@ sub start_server{
     
     $q->init();
     
-    while(1){        
+    WHILE:while(1){        
         my $client = $server->accept();
         
         if(!defined($client)){
@@ -122,7 +122,13 @@ sub start_server{
                     
                     check_queue_workers($q, scalar @$msg) if $id;
                     
-                    send_request($client, [$id], $type);
+                    my $snd = send_request($client, [$id], $type);
+                    
+                    if($snd){
+                        WARN("Can't send send_request to client");
+                        close($client);
+                        last(WHILE);
+                    }
                 }
                 when([TYPE_CHECK_WORK]){
                     if(scalar @$msg != 1){
