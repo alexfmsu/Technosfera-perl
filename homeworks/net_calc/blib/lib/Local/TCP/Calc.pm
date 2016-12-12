@@ -7,6 +7,16 @@ use strict;
 use warnings;
 use utf8;
 
+require Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(
+    TYPE_CONN_OK TYPE_CONN_ERR
+    TYPE_START_WORK TYPE_CHECK_WORK
+    STATUS_NEW STATUS_WORK STATUS_ERROR STATUS_DONE
+    get_request send_request
+    $PATH $WAIT_TIME
+);
+
 sub TYPE_START_WORK {1}
 sub TYPE_CHECK_WORK {2}
 sub TYPE_CONN_ERR   {3}
@@ -19,8 +29,8 @@ sub STATUS_ERROR {4}
 
 sub PACKED_HEADER_SIZE {8}
 
-sub PATH {'/tmp/'}
-sub WAIT_TIME {3}
+our $WAIT_TIME = 30;
+our $PATH = './tasks/A';
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
 sub pack_header{

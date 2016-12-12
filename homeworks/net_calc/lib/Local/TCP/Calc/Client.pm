@@ -9,25 +9,12 @@ use utf8;
 
 use IO::Socket;
 
-use Local::TCP::Calc;
-
 our $VERSION = v1.0;
 
-BEGIN{
-    if($] < 5.018){
-        package experimental;
-        
-        use warnings::register;
-    }
-}
-no warnings 'experimental';
-
-# EXTERN CONST
-our $TYPE_CONN_ERR = Local::TCP::Calc::TYPE_CONN_ERR();
-
-# EXTERN SUBS
-our $get_request = \&Local::TCP::Calc::get_request;
-our $send_request = \&Local::TCP::Calc::send_request;
+use Local::TCP::Calc qw(
+    TYPE_CONN_ERR
+    get_request send_request
+);
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
 sub set_connect{
@@ -46,7 +33,7 @@ sub set_connect{
     
     $server->sysread($status, 1);
     
-    if($status == $TYPE_CONN_ERR){
+    if($status == TYPE_CONN_ERR){
         die "Connection refused by server ".$ip." on port ".$port; 
     }
     
@@ -59,9 +46,9 @@ sub do_request{
     my $type = shift;
     my $message = shift;
     
-    $send_request->($server, $message, $type);
+    send_request($server, $message, $type);
     
-    my ($status, $struct) = $get_request->($server);
+    my ($status, $struct) = get_request($server);
     
     return @$struct;
 }

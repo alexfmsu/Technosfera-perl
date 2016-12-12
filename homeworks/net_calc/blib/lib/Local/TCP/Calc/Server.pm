@@ -16,7 +16,12 @@ BEGIN{
 }
 no warnings 'experimental';
 
-use Local::TCP::Calc;
+use Local::TCP::Calc qw(
+    TYPE_CONN_OK TYPE_CONN_ERR
+    TYPE_START_WORK TYPE_CHECK_WORK
+    STATUS_ERROR STATUS_DONE
+    get_request send_request
+);
 use Local::TCP::Calc::Server::Queue;
 use Local::TCP::Calc::Server::Worker;
 
@@ -30,22 +35,6 @@ my $receiver_count;
 
 my @pids_receiver = ();
 my @pids_worker = ();
-
-# EXTERN CONST
-our $TYPE_CONN_OK = Local::TCP::Calc::TYPE_CONN_OK();
-our $TYPE_CONN_ERR = Local::TCP::Calc::TYPE_CONN_ERR();
-
-our $TYPE_START_WORK = Local::TCP::Calc::TYPE_START_WORK();
-our $TYPE_CHECK_WORK = Local::TCP::Calc::TYPE_CHECK_WORK();
-
-our $STATUS_NEW = Local::TCP::Calc::STATUS_NEW();
-our $STATUS_WORK = Local::TCP::Calc::STATUS_WORK();
-our $STATUS_ERROR = Local::TCP::Calc::STATUS_ERROR();
-our $STATUS_DONE = Local::TCP::Calc::STATUS_DONE();
-
-# EXTERN SUBS
-our $get_request = \&Local::TCP::Calc::get_request;
-our $send_request = \&Local::TCP::Calc::send_request;
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
 sub REAPER{
@@ -101,7 +90,7 @@ sub start_server{
         $in_process = scalar @pids_receiver;
         
         if($in_process >= $receiver_count){
-            $client->syswrite($TYPE_CONN_ERR, 1);
+            $client->syswrite(TYPE_CONN_ERR, 1);
             
             close($client);
             next;
@@ -119,23 +108,23 @@ sub start_server{
         if(defined $child){
             close($server);
             
-            $client->syswrite($TYPE_CONN_OK, 1);
+            $client->syswrite(TYPE_CONN_OK, 1);
             
-            my ($type, $msg) = $get_request->($client);
+            my ($type, $msg) = get_request($client);
             
             if(!defined($type) || !defined($msg)){
                 drop_connection($client);
             }
             
             given($type){
-                when($TYPE_START_WORK){
+                when([TYPE_START_WORK]){
                     my $id = $q->add($msg);
                     
-                    check_queue_workers($q) if $id;
+                    check_queue_workers($q, scalar @$msg) if $id;
                     
-                    $send_request->($client, [$id], $type);
+                    send_request($client, [$id], $type);
                 }
-                when($TYPE_CHECK_WORK){
+                when([TYPE_CHECK_WORK]){
                     if(scalar @$msg != 1){
                         drop_connection($client, "Error: wrong id for CHECK_WORK");
                     }
@@ -149,14 +138,14 @@ sub start_server{
                     push(@result, $status); 
                     
                     given($status){
-                        when([$STATUS_ERROR, $STATUS_DONE]){
+                        when([STATUS_ERROR, STATUS_DONE]){
                             push(@result, $q->get_result($id));
                             
                             $q->delete($id);
                         }
                     }
                     
-                    $send_request->($client, \@result, $type);
+                    send_request($client, \@result, $type);
                 }
             }
             
@@ -169,6 +158,7 @@ sub start_server{
 
 sub check_queue_workers{
     my $q = shift;
+    my $expr_count = shift;
     
     return if $max_worker == scalar @pids_worker;
     return unless (my $id = $q->get());
@@ -195,7 +185,8 @@ sub check_queue_workers{
                 my $a = Local::Calculator::Evaluate::evaluate($rpn);
                 
                 return $a;
-            }
+            },
+            expr_count=>$expr_count
         );
         
         $worker->start();

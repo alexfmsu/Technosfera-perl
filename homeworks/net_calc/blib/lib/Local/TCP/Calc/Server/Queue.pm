@@ -13,20 +13,15 @@ use Fcntl qw(:flock);
 use POSIX;
 use PerlIO::gzip;
 
-use Local::TCP::Calc;
+use Local::TCP::Calc qw(
+    STATUS_NEW STATUS_WORK STATUS_DONE
+    $PATH $WAIT_TIME
+);
 
 has f_handle       => (is => 'rw', isa => 'FileHandle');
 has queue_filename => (is => 'ro', isa => 'Str', default => '/tmp/local_queue.log');
 has max_task       => (is => 'rw', isa => 'Int', default => 0);
 has updated => (is => 'rw', isa => 'Int', default => 0);
-
-# EXTERN CONST
-our $STATUS_NEW = Local::TCP::Calc::STATUS_NEW();
-our $STATUS_WORK = Local::TCP::Calc::STATUS_WORK();
-our $STATUS_DONE = Local::TCP::Calc::STATUS_DONE();
-
-our $PATH = Local::TCP::Calc::PATH();
-our $WAIT_TIME = Local::TCP::Calc::WAIT_TIME();
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
 $SIG{ALRM} = sub{
@@ -110,7 +105,7 @@ sub add{
         
         $id = $max_id+1;
         
-        push @$q_tasks, {id => $id, status => $STATUS_NEW};
+        push @$q_tasks, {id => $id, status => STATUS_NEW};
         
         $self->updated(1);
         
@@ -132,8 +127,8 @@ sub get{
     my $q_tasks = $self->OPEN();
     
     for(@$q_tasks){
-        if($_->{status} == $STATUS_NEW){
-            $_ = {id=>($id = $_->{id}), status=>$STATUS_WORK};
+        if($_->{status} == STATUS_NEW){
+            $_ = {id=>($id = $_->{id}), status=>STATUS_WORK};
             
             $self->updated(1);
             
@@ -163,7 +158,7 @@ sub delete{
     $self->updated(1);
     
     unlink $PATH."task_$id.in";
-    unlink $PATH."task_$id.out";
+    # unlink $PATH."task_$id.out";
     
     $self->CLOSE($q_tasks);
 }
@@ -198,7 +193,7 @@ sub to_done{
     
     for(@$q_tasks){
         if($id == $_->{id}){
-            $_->{status} = $STATUS_DONE;
+            $_->{status} = STATUS_DONE;
                 
             $self->updated(1);
             
@@ -232,6 +227,13 @@ sub get_result{
     close $fh_out;
     
     return @result;
+}
+# -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
+sub get_out_filename{
+    my $id = shift;
+    
+    return $PATH."task_$id.out";
 }
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------

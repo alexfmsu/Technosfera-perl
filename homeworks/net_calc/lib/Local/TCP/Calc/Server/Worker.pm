@@ -13,6 +13,9 @@ use POSIX;
 use Fcntl qw(:flock);
 use PerlIO::gzip;
 
+use Local::TCP::Calc qw(
+    $PATH $WAIT_TIME
+);
 use Local::Calculator::RPN;
 use Local::Calculator::Evaluate;
 
@@ -20,10 +23,7 @@ has cur_task_id => (is => 'ro', isa => 'Int', required => 1);
 has forks       => (is => 'rw', isa => 'ArrayRef', default => sub {return []});
 has calc_ref    => (is => 'ro', isa => 'CodeRef', required => 1);
 has max_forks   => (is => 'ro', isa => 'Int', required => 1);
-
-# EXTERN CONST
-our $PATH = Local::TCP::Calc::PATH();
-our $WAIT_TIME = Local::TCP::Calc::WAIT_TIME();
+has expr_count   => (is => 'ro', isa => 'Int', required => 1);
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
 has error => (is => 'rw', isa => 'Int', default => 0);
@@ -64,53 +64,80 @@ sub start{
     
     $SIG{CHLD} = "DEFAULT";
     
-    my $id = $self->{cur_task_id};
+    my $id = $self->cur_task_id;
     
-    open(my $fh_in, '<:gzip', $PATH."task_".$id."_in.gz") or die $!;
+    my @tasks = ();
+    my $cnt = $self->expr_count;
+    my $fh_in;
+    
+    open($fh_in, '<:gzip', $PATH."task_".$id."_in.gz") or die $!;
+    while(my $expr = <$fh_in>){
+        chomp($expr);
+        push @tasks, $expr;
+    }
+    close($fh_in);
+    
     open(my $fh_out, '>', $PATH."task_$id.out") or die $!;
     
     my @forks = ();
     $self->{forks} = \@forks;
-
-    my $max_forks = $self->{max_forks};
     
-    while(my $expr = <$fh_in>){
-        chomp($expr);
+    my $max_forks = $self->max_forks;
+    my $tasks_per_fork = floor($cnt/$max_forks);
+    
+    my $start = 0;
+    my $fin = $tasks_per_fork - 1;
+    
+    my $mod_cnt = $cnt % $max_forks;
+    
+    my $i = 0;    
+    
+    for(0..$max_forks-2){
+        my $pid = fork();
         
-        while(scalar @forks == $max_forks){ 
-            $self->wait_child();    
-            
-            if($self->{error}){ 
-                $self->write_err("Error: task execution is corrupt", $fh_out);
-                
-                last;
-            }
+        if(!defined($pid)){
+            warn "Can't fork $!";
+            $self->error(1);
+            last;
         }
-        
-        last if($self->{error});
-        
-        my $child = fork();
-        
-        if($child){
-            push(@forks, $child);
-
-            next;
-        } 
-        
-        if(defined($child)){
-            my $res = $self->{calc_ref}($expr);
+        if($pid > 0){
+            if($i++ == 0){ 
+                for(@tasks[$start..$fin]){
+                    $SIG{CHLD} = "IGNORE";
+                    my $res = $self->{calc_ref}($_);
+                    $SIG{CHLD} = "DEFAULT";
+                
+                    $self->write_res($res, $fh_out);
+                }
+            }    
             
-            $self->write_res($res, $fh_out);
+            $start = $fin+1;
+            $fin = $start + $tasks_per_fork - 1; 
+                    
+            if($mod_cnt > 0){
+                $fin++;
+                $mod_cnt--;
+            }
+        }else{
+            for(@tasks[$start..$fin]){
+                $SIG{CHLD} = "IGNORE";
+                my $res = $self->{calc_ref}($_);
+                $SIG{CHLD} = "DEFAULT";
+                        
+                $self->write_res($res, $fh_out);
+            }
             
             exit(0);
-        }else{
-            die "Can't fork: $!"
         }
     }
     
-    while($self->wait_child() != -1){}
+    # while(waitpid(-1, WNOHANG) > 0){};
+    while($self->wait_child() != -1){};
     
-    close $fh_in;
+    if($self->error){ 
+        $self->write_err("Error: task execution is corrupt", $fh_out);
+    }             
+    
     close $fh_out;
 }
 
@@ -121,18 +148,15 @@ sub wait_child{
     
     return $w_pid if $w_pid == -1;
     
-    my @tmp = ();
-
-    for(@{$self->{forks}}){
-        push(@tmp, $_) if $_ != $w_pid;
-    }
+    my @forks = ();
     
-    @{$self->{forks}} = @tmp;
+    $self->{forks} = \@forks;
+    @forks = grep{$_ != $w_pid} @forks;
     
     if(!WIFEXITED($?)){
-        kill('TERM', $_) for @{$self->{forks}};
+        kill('TERM', $_) for @{$self->forks};
         
-        $self->{error} = 1;
+        $self->error(1);
     }
     
     return $w_pid;
